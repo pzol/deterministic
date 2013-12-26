@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'deterministic/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "."
+  spec.name          = "deterministic"
   spec.version       = Deterministic::VERSION
   spec.authors       = ["Piotr Zolnierek"]
   spec.email         = ["pz@anixe.pl"]
