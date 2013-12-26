@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Deterministic::VERSION
   spec.authors       = ["Piotr Zolnierek"]
   spec.email         = ["pz@anixe.pl"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
-  spec.homepage      = ""
+  spec.description   = %q{A gem providing failsafe flow}
+  spec.summary       = %q{see above}
+  spec.homepage      = "http://github.com/pzol/deterministic"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
