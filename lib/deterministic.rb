@@ -1,5 +1,9 @@
 require "deterministic/version"
 
-module Deterministic
-  # Your code goes here...
-end
+module Deterministic; end
+
+require 'deterministic/either'
+require 'deterministic/either/match'
+require 'deterministic/either/attempt_all'
+require 'deterministic/either/success'
+require 'deterministic/either/failure'
