@@ -21,4 +21,26 @@ describe Deterministic::Either::Match do
       end
     ).to eq "Failure 1" 
   end
+
+  it "can match with values" do
+    expect(
+      Failure(2).match do
+        success    { |v| "not matched s"  }
+        success(1) { |v| "not matched s1" }
+        failure(1) { |v| "not matched f1" }
+        failure(2) { |v| "matched #{v}"   }
+        failure(3) { |v| "not matched f3" }
+      end
+    ).to eq "matched 2"
+  end
+
+  it "can match either" do
+    expect(
+      Failure(2).match do
+        success    { |v| "not matched s"  }
+        either(2)  { |v| "either #{v}"    }
+        failure(3) { |v| "not matched f3" }
+      end
+    ).to eq "either 2"
+  end
 end

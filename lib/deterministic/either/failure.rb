@@ -1,3 +1,3 @@
 module Deterministic::Either
-  class Failure < Abstract; end
+  class Failure < Either; end
 end

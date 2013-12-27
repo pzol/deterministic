@@ -7,12 +7,17 @@ module Deterministic::Either
     Failure.unit(value)
   end
 
-  class Abstract
+  class Either
     def self.unit(value)
-      return value if value.is_a? Abstract
+      return value if value.is_a? Either
       # return Failure.new(value)       if value.nil? || (value.respond_to?(:empty?) && value.empty?) || !value
       # return Success.new(value)
       return new(value)
+    end
+
+    def is?(s)
+      const_name = s.slice(0,1).capitalize + s.slice(1..-1)
+      is_a? Module.const_get(const_name)
     end
 
     def success?
@@ -25,7 +30,7 @@ module Deterministic::Either
 
     def bind(other)
       return self if failure?
-      return other if other.is_a? Abstract
+      return other if other.is_a? Either
       # return concat(proc) if proc.is_a? Either
 
       # begin

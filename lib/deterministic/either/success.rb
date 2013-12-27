@@ -1,3 +1,3 @@
 module Deterministic::Either
-  class Success < Abstract; end
+  class Success < Either; end
 end

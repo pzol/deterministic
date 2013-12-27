@@ -20,7 +20,8 @@ describe Deterministic::Either::Success do
     expect(Success(1).bind Failure(2)).to eq(Failure(2))
   end
 
-  it "unit" do
-    expect(Success(Success(1))).to eq (Success(1))
-  end
+  specify { expect(Success(Success(1))).to eq Success(1) }
+  specify { expect(Success(1).is? :success).to be true }
+  specify { expect(Success(1).is? :either).to  be true  }
+  specify { expect(Success(1).is? :failure).to be false }
 end

@@ -32,7 +32,7 @@ module Deterministic::Either
     def let(proc=nil, &block)
       @__tries << ->(acc) { 
         instance_exec(acc, &(proc || block)).tap do |value|
-          raise EitherExpectedError unless value.is_a? Either::Abstract
+          raise EitherExpectedError unless value.is_a? Either
         end
       }
     end

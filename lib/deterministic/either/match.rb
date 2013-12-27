@@ -7,21 +7,36 @@ module Deterministic::Either
 
   class Match
     def initialize(either)
-      @either    = either
-      @successes = []
-      @failures  = []
+      @either     = either
+      @collection = []
     end
 
-    def success(&block)
-      @successes << yield(@either.value) if @either.success?
+    def success(value=nil, &block)
+      q(:success, value, block)
     end
 
-    def failure
-      @failures << yield(@either.value) if @either.failure?
+    def failure(value=nil, &block)
+      q(:failure, value, block)
+    end
+
+    def either(value=nil, &block)
+      q(:either, value, block)
     end
 
     def result
-      @failures.any? ? @failures.last : @successes.last
+      matcher = @collection.select { |m| m.first.call }.last
+      matcher.last.call(@either.value)
+    end
+
+  private
+    def q(type, condition, block)
+      if condition.nil?
+        condition_p = -> { true }
+      else
+        condition_p = -> { condition == @either.value }
+      end
+
+      @collection << [condition_p, block] if @either.is? type
     end
   end
 end
