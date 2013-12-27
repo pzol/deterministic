@@ -104,7 +104,7 @@ Success(1).match do
 end # => "Success 1"
 ```
 
-Combining `#attempt_all` and `#match` is the final goal:
+Combining `#attempt_all` and `#match` is the ultimate sophistication:
 
 ```ruby
 Either.attempt_all do
