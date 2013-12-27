@@ -1,6 +1,8 @@
 # Deterministic
 
-This is a spiritual successor of the [Monadic gem](http://github.com/pzol/monadic)
+This is a spiritual successor of the [Monadic gem](http://github.com/pzol/monadic). 
+
+This gem is still __WORK IN PROGRESS__.
 
 ## Installation
 
@@ -86,6 +88,40 @@ Note2: only the last matching pattern block will be executed
 
 The result returned will be the result of the last `#try` or `#let`
 
+Values for patterns are good:
+
+```ruby
+Success(1).match do
+  success(1) { "Success #{v}" }
+end # => "Success 1"
+```
+
+You can and should also use procs for patterns:
+
+```ruby
+Success(1).match do
+  success ->(v) { v == 1} { "Success #{v}" }
+end # => "Success 1"
+```
+
+Combining `#attempt_all` and `#match` is the final goal:
+
+```ruby
+Either.attempt_all do
+  try { 1 }
+  try { |v| v + 1 }
+end.match do
+  success(1) { |v| "We made it to step #{v}" }
+  success(2) { |v| "The correct answer is #{v}"}
+end # => "The correct answer is 2"
+```
+
+## Inspirations
+ * My [Monadic gem](http://github.com/pzol/monadic) of course
+ * `#attempt_all` was somewhat inspired by [An error monad in Clojure](http://brehaut.net/blog/2011/error_monads)
+ * [Pithyless' rumblings](https://gist.github.com/pithyless/2216519) 
+ * [either by rsslldnphy](https://github.com/rsslldnphy/either)
+
 ## Contributing
 
 1. Fork it
@@ -93,8 +129,3 @@ The result returned will be the result of the last `#try` or `#let`
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
-
-## Inspirations
- * My [Monadic gem](http://github.com/pzol/monadic) of course
- * `#attempt_all` was somewhat inspired by [An error monad in Clojure](http://brehaut.net/blog/2011/error_monads)
- * [Pithyless' rumblings](https://gist.github.com/pithyless/2216519) 
