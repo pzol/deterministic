@@ -68,8 +68,7 @@ Success(1).match do
   either  { |v| "either #{v}"}
 end # => "either 1"
 ```
-Note: the inner value has been unwrapped! 
-
+Note1: the inner value has been unwrapped! 
 Note2: only the last matching pattern block will be executed
 
 The result returned will be the result of the last `#try` or `#let`
