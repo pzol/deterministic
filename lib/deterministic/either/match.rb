@@ -24,16 +24,18 @@ module Deterministic::Either
     end
 
     def result
-      matcher = @collection.select { |m| m.first.call }.last
+      matcher = @collection.select { |m| m.first.call(@either.value) }.last
       matcher.last.call(@either.value)
     end
 
   private
     def q(type, condition, block)
       if condition.nil?
-        condition_p = -> { true }
+        condition_p = ->(v) { true }
+      elsif condition.is_a?(Proc)
+        condition_p = condition
       else
-        condition_p = -> { condition == @either.value }
+        condition_p = ->(v) { condition == @either.value }
       end
 
       @collection << [condition_p, block] if @either.is? type

@@ -43,4 +43,12 @@ describe Deterministic::Either::Match do
       end
     ).to eq "either 2"
   end
+
+  it "can mach with lambdas" do
+    expect(
+      Success(1).match do
+        success ->(v) { v == 1 } { |v| "matched #{v}" }
+      end
+    ).to eq "matched 1"
+  end
 end
