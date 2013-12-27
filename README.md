@@ -4,20 +4,6 @@ This is a spiritual successor of the [Monadic gem](http://github.com/pzol/monadi
 
 This gem is still __WORK IN PROGRESS__.
 
-## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'deterministic'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install deterministic
-
 ## Usage
 
 ### Either#attempt_all
@@ -121,6 +107,20 @@ end # => "The correct answer is 2"
  * `#attempt_all` was somewhat inspired by [An error monad in Clojure](http://brehaut.net/blog/2011/error_monads)
  * [Pithyless' rumblings](https://gist.github.com/pithyless/2216519) 
  * [either by rsslldnphy](https://github.com/rsslldnphy/either)
+
+## Installation
+
+Add this line to your application's Gemfile:
+
+    gem 'deterministic'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install deterministic
 
 ## Contributing
 
