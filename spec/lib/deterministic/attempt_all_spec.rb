@@ -14,6 +14,15 @@ describe Deterministic::Either::AttemptAll do
     ).to eq Success(2)
   end
 
+  it "#try values are passed to the next command" do
+    expect(
+      Either.attempt_all do
+        try { 1 }
+        try { |v| v + 1 }
+      end
+    ).to eq Success(2)
+  end
+
   it "try treat exceptions as Failure" do
     attempt = Either.attempt_all do
       try { 1 }
@@ -54,5 +63,36 @@ describe Deterministic::Either::AttemptAll do
         let { raise "error" }
       end
     }.to raise_error
+  end
+
+  it "works with an OpenStruct" do
+    context = OpenStruct.new
+    attempt = Either.attempt_all(context) do
+      let { Success(self.alpha = 2) }
+      try { self.res = 1 }
+    end
+
+    expect(context.res).to eq 1
+    expect(context.alpha).to eq 2
+  end
+
+  it "can operate in the context of a host" do
+    class Host
+      attr_accessor :a
+      def initialize
+        @a = 1
+      end
+    end
+
+    host = Host.new
+
+    expect(
+      Either.attempt_all(host) do
+        try { self.a += 1 }
+        try { self.a + 1 }
+      end
+    ).to eq Success(3)
+
+    expect(host.a).to eq 2
   end
 end
