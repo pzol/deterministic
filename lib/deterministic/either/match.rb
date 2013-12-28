@@ -1,4 +1,4 @@
-module Deterministic::Match
+module Deterministic::PatternMatching
 
   def match(proc=nil, &block)
     match = Match.new(self)
@@ -20,17 +20,17 @@ module Deterministic::Match
       matcher.result(@container.value)
     end
 
-    # Either specific DSL
-    def success(value=nil, &block)
-      q(:success, value, block)
+    # TODO: Either specific DSL, will need to move it to Either, later on
+    %w[Success Failure Either].each do |s|
+      define_method s.downcase.to_sym do |value=nil, &block|
+        klas = Module.const_get(s)
+        push(klas, value, block)
+      end
     end
 
-    def failure(value=nil, &block)
-      q(:failure, value, block)
-    end
-
-    def either(value=nil, &block)
-      q(:either, value, block)
+    # catch-all
+    def any(value=nil, &result_block)
+      push(Object, value, result_block)
     end
 
   private
@@ -44,16 +44,24 @@ module Deterministic::Match
       end
     end
 
-    def q(type, condition, block)
-      if condition.nil?
-        condition_p = ->(v) { true }
-      elsif condition.is_a?(Proc)
-        condition_p = condition
-      else
-        condition_p = ->(v) { condition == @container.value }
+    def push(type, condition, result_block)
+      condition_pred = case
+      when condition.nil?;        ->(v) { true }
+      when condition.is_a?(Proc); condition
+      else                        ->(v) { condition == @container.value }
       end
 
-      @collection << Matcher.new(condition_p, block) if @container.is? type
+      matcher_pred = compose_predicates(type_pred[type], condition_pred)
+      @collection << Matcher.new(matcher_pred, result_block)
+    end
+
+    def compose_predicates(f, g)
+      ->(*args) { f[*args] && g[*args] }
+    end
+
+    # return a partial function for matching a matcher's type
+    def type_pred
+      (->(type, x) { @container.is_a? type }).curry
     end
   end
 end

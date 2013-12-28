@@ -37,7 +37,7 @@ describe Deterministic::Either::Match do
   it "catch-all" do
     expect(
       Success(1).match do
-        either { "catch-all" }
+        any { "catch-all" }
       end
     ).to eq "catch-all"
   end
@@ -65,6 +65,6 @@ describe Deterministic::Either::Match do
       Success(1).match do
         failure { "you'll never get me" }
       end
-    }.to raise_error Deterministic::Match::NoMatchError
+    }.to raise_error Deterministic::PatternMatching::NoMatchError
   end
 end

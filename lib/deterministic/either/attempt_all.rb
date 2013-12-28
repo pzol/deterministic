@@ -15,7 +15,7 @@ class Deterministic::Either
 
     def call(initial=nil)
       result = @tries.inject(Success(initial)) do |acc, try|
-        acc.success? ? acc.bind(try.call(acc)) : acc
+        acc.success? ? acc << try.call(acc) : acc
       end
     end
 

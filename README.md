@@ -69,11 +69,12 @@ Success(1).match do
 end # => "either 1"
 ```
 Note1: the inner value has been unwrapped! 
-Note2: only the last matching pattern block will be executed
 
-The result returned will be the result of the last `#try` or `#let`
+Note2: only the __last__ matching pattern block will be executed, so order __can__ be important.
 
-Values for patterns are good:
+The result returned will be the result of the __last__ `#try` or `#let`. As a side note, `#try` is a monad, `#let` is a functor.
+
+Values for patterns are good, too:
 
 ```ruby
 Success(1).match do
@@ -109,11 +110,11 @@ Success(1).match do
 end # => NoMatchError
 ```
 
-A way to have a catch-all would be using an `either`:
+A way to have a catch-all would be using an `any`:
 
 ```ruby
 Success(1).match do
-  either { "catch-all" }
+  any { "catch-all" }
 end # => "catch-all"
 ```
 
@@ -122,6 +123,7 @@ end # => "catch-all"
  * `#attempt_all` was somewhat inspired by [An error monad in Clojure](http://brehaut.net/blog/2011/error_monads)
  * [Pithyless' rumblings](https://gist.github.com/pithyless/2216519) 
  * [either by rsslldnphy](https://github.com/rsslldnphy/either)
+ * [Functors, Applicatives, And Monads In Pictures](http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html)
 
 ## Installation
 
