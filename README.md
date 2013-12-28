@@ -101,6 +101,22 @@ end.match do
 end # => "The correct answer is 2"
 ```
 
+If no match was found a `NoMatchError` is raised, so make sure you always cover all possible outcomes.
+
+```ruby
+Success(1).match do
+  failure(1) { "you'll never get me" }
+end # => NoMatchError
+```
+
+A way to have a catch-all would be using an `either`:
+
+```ruby
+Success(1).match do
+  either { "catch-all" }
+end # => "catch-all"
+```
+
 ## Inspirations
  * My [Monadic gem](http://github.com/pzol/monadic) of course
  * `#attempt_all` was somewhat inspired by [An error monad in Clojure](http://brehaut.net/blog/2011/error_monads)

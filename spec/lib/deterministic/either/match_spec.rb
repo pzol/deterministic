@@ -34,6 +34,14 @@ describe Deterministic::Either::Match do
     ).to eq "matched 2"
   end
 
+  it "catch-all" do
+    expect(
+      Success(1).match do
+        either { "catch-all" }
+      end
+    ).to eq "catch-all"
+  end
+
   it "can match either" do
     expect(
       Failure(2).match do
@@ -44,11 +52,19 @@ describe Deterministic::Either::Match do
     ).to eq "either 2"
   end
 
-  it "can mach with lambdas" do
+  it "can match with lambdas" do
     expect(
       Success(1).match do
         success ->(v) { v == 1 } { |v| "matched #{v}" }
       end
     ).to eq "matched 1"
+  end
+
+  it "no match" do
+    expect {
+      Success(1).match do
+        failure { "you'll never get me" }
+      end
+    }.to raise_error Deterministic::Match::NoMatchError
   end
 end

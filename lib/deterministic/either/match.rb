@@ -6,6 +6,8 @@ module Deterministic::Match
     match.result
   end
 
+  class NoMatchError < StandardError; end
+
   class Match
     def initialize(container)
       @container  = container
@@ -13,8 +15,9 @@ module Deterministic::Match
     end
 
     def result
-      matcher = @collection.select { |m| m.condition.call(@container.value) }.last
-      matcher.block.call(@container.value)
+      matcher = @collection.select { |m| m.matches?(@container.value) }.last
+      raise NoMatchError if matcher.nil?
+      matcher.result(@container.value)
     end
 
     # Either specific DSL
@@ -31,7 +34,15 @@ module Deterministic::Match
     end
 
   private
-    Matcher = Struct.new(:condition, :block)
+    Matcher = Struct.new(:condition, :block) do 
+      def matches?(value)
+        condition.call(value)
+      end
+
+      def result(value)
+        block.call(value)
+      end
+    end
 
     def q(type, condition, block)
       if condition.nil?
