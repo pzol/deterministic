@@ -12,6 +12,12 @@ module Deterministic::Match
       @collection = []
     end
 
+    def result
+      matcher = @collection.select { |m| m.condition.call(@container.value) }.last
+      matcher.block.call(@container.value)
+    end
+
+    # Either specific DSL
     def success(value=nil, &block)
       q(:success, value, block)
     end
@@ -24,12 +30,9 @@ module Deterministic::Match
       q(:either, value, block)
     end
 
-    def result
-      matcher = @collection.select { |m| m.first.call(@container.value) }.last
-      matcher.last.call(@container.value)
-    end
-
   private
+    Matcher = Struct.new(:condition, :block)
+
     def q(type, condition, block)
       if condition.nil?
         condition_p = ->(v) { true }
@@ -39,7 +42,7 @@ module Deterministic::Match
         condition_p = ->(v) { condition == @container.value }
       end
 
-      @collection << [condition_p, block] if @container.is? type
+      @collection << Matcher.new(condition_p, block) if @container.is? type
     end
   end
 end
