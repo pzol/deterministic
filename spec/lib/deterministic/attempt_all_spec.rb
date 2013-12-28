@@ -1,7 +1,6 @@
 require 'spec_helper'
 require 'deterministic'
 
-include Deterministic::Either
 include Deterministic
 
 describe Deterministic::Either::AttemptAll do

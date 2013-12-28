@@ -1,4 +1,4 @@
-module Deterministic::Either
+module Deterministic
   def Success(value)
     Success.unit(value)
   end
@@ -8,6 +8,8 @@ module Deterministic::Either
   end
 
   class Either
+    include Deterministic::Match
+
     def self.unit(value)
       return value if value.is_a? Either
       # return Failure.new(value)       if value.nil? || (value.respond_to?(:empty?) && value.empty?) || !value

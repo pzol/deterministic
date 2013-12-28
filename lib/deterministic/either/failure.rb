@@ -1,3 +1,3 @@
-module Deterministic::Either
+module Deterministic
   class Failure < Either; end
 end

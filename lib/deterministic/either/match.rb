@@ -1,4 +1,5 @@
-module Deterministic::Either
+module Deterministic::Match
+
   def match(proc=nil, &block)
     match = Match.new(self)
     match.instance_eval &(proc || block)
@@ -6,8 +7,8 @@ module Deterministic::Either
   end
 
   class Match
-    def initialize(either)
-      @either     = either
+    def initialize(container)
+      @container  = container
       @collection = []
     end
 
@@ -24,8 +25,8 @@ module Deterministic::Either
     end
 
     def result
-      matcher = @collection.select { |m| m.first.call(@either.value) }.last
-      matcher.last.call(@either.value)
+      matcher = @collection.select { |m| m.first.call(@container.value) }.last
+      matcher.last.call(@container.value)
     end
 
   private
@@ -35,10 +36,10 @@ module Deterministic::Either
       elsif condition.is_a?(Proc)
         condition_p = condition
       else
-        condition_p = ->(v) { condition == @either.value }
+        condition_p = ->(v) { condition == @container.value }
       end
 
-      @collection << [condition_p, block] if @either.is? type
+      @collection << [condition_p, block] if @container.is? type
     end
   end
 end

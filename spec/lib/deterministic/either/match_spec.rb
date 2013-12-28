@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'deterministic'
 
-include Deterministic::Either
+include Deterministic
 
 describe Deterministic::Either::Match do
   it "can match Success" do

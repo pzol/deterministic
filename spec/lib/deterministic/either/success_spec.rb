@@ -1,9 +1,9 @@
 require 'spec_helper'
 require 'deterministic'
 
-include Deterministic::Either
+include Deterministic
 
-describe Deterministic::Either::Success do
+describe Deterministic::Success do
   subject { described_class.unit(1) }
 
   specify { expect(subject).to be_an_instance_of described_class }

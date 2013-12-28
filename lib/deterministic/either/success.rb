@@ -1,3 +1,3 @@
-module Deterministic::Either
+module Deterministic
   class Success < Either; end
 end

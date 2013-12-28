@@ -1,5 +1,6 @@
 require 'ostruct'
-module Deterministic::Either
+
+class Deterministic::Either
   def self.attempt_all(context=OpenStruct.new, &block)
     AttemptAll.new(context, &block).call
   end
