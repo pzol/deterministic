@@ -19,6 +19,7 @@ class Deterministic::Either
       end
     end
 
+    # This is a functor
     def try(&block)
       try_p = ->(acc) {
         begin
@@ -32,6 +33,7 @@ class Deterministic::Either
       @tries << try_p
     end
 
+    # Basicly a monad
     def let(sym=nil, &block)
       @tries << ->(acc) { 
         @context.instance_exec(acc, &block).tap do |value|

@@ -17,7 +17,6 @@ describe Deterministic::Success do
   specify { expect(subject).to be_success }
   specify { expect(subject).not_to be_failure }
 
-  # public constructor #Success[]
   specify { expect(subject).to be_an_instance_of described_class }
   specify { expect(subject).to eq(described_class.new(1)) }
   specify { expect(subject << Success(2)).to eq(Success(2)) }

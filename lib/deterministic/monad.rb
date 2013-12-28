@@ -15,14 +15,14 @@ module Deterministic
 
     # The functor: takes a function (a -> b) and applies it to the inner value of the monad (Ma),
     # boxes it back to the same monad (Mb)
-    # fmap :: (a -> b) -> Ma -> Mb
+    # fmap :: (a -> b) -> M a -> M b
     def map(proc=nil, &block)
       result = (proc || block).call(value)
       self.class.new(result)
     end
 
     # The monad: takes a function which returns a monad, applies
-    # bind :: Ma -> (a -> Mb) -> Mb
+    # bind :: M a  -> (a -> Mb) -> M b
     def bind(proc=nil, &block)
       result = (proc || block).call(value)
       raise NotMonadError unless result.is_a? Monad
@@ -30,11 +30,12 @@ module Deterministic
     end
 
     # Get the underlying value, return in Haskell
-    # return :: m a -> a
+    # return :: M a -> a
     def value
       @value
     end
 
+    # Two monads are equivalent if they are of the same type and when their values are equal
     def ==(other)
       return false unless other.is_a? self.class
       @value == other.instance_variable_get(:@value)

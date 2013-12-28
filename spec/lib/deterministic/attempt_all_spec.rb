@@ -75,23 +75,23 @@ describe Deterministic::Either::AttemptAll do
     expect(context.alpha).to eq 2
   end
 
-  it "can operate in the context of a host" do
-    class Host
+  it "can operate in the context of a context" do
+    class Context
       attr_accessor :a
       def initialize
         @a = 1
       end
     end
 
-    host = Host.new
+    context = Context.new
 
     expect(
-      Either.attempt_all(host) do
+      Either.attempt_all(context) do
         try { self.a += 1 }
         try { self.a + 1 }
       end
     ).to eq Success(3)
 
-    expect(host.a).to eq 2
+    expect(context.a).to eq 2
   end
 end
