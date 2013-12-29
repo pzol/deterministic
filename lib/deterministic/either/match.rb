@@ -47,6 +47,7 @@ module Deterministic::PatternMatching
     def push(type, condition, result_block)
       condition_pred = case
       when condition.nil?;        ->(v) { true }
+      when condition.is_a?(Class);  ->(v) { condition === @container.value }
       when condition.is_a?(Proc); condition
       else                        ->(v) { condition == @container.value }
       end

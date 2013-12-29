@@ -34,6 +34,14 @@ describe Deterministic::Either::Match do
     ).to eq "matched 2"
   end
 
+  it "can match with classes" do
+    expect(
+      Success([1, 2, 3]).match do
+        success(Array) { |v| v.first }
+      end
+    ).to eq 1
+  end
+
   it "catch-all" do
     expect(
       Success(1).match do
