@@ -60,6 +60,12 @@ However, the real fun starts if you use it with your own context. You can use th
 
 ### Pattern matching
 Now that you have some result, you want to control flow by providing patterns.
+`#match` can match by
+
+ * success, failure, either or any
+ * values
+ * lambdas
+ * classes
 
 ```ruby
 Success(1).match do
@@ -88,6 +94,14 @@ You can and should also use procs for patterns:
 Success(1).match do
   success ->(v) { v == 1} { "Success #{v}" }
 end # => "Success 1"
+```
+
+Also you can match the result class
+
+```ruby
+Success([1, 2, 3]).match do
+  success(Array) { |v| v.first }
+end # => 1
 ```
 
 Combining `#attempt_all` and `#match` is the ultimate sophistication:
