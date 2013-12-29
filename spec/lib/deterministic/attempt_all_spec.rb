@@ -64,6 +64,15 @@ describe Deterministic::Either::AttemptAll do
     }.to raise_error
   end
 
+  it "#let passes params unboxed" do
+    expect(
+      Either.attempt_all do
+        try { 1 }
+        let { |v| Success(v + 1) }
+      end
+    ).to eq Success(2)
+  end
+
   it "works with an OpenStruct" do
     context = OpenStruct.new
     attempt = Either.attempt_all(context) do

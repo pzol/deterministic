@@ -36,8 +36,8 @@ class Deterministic::Either
     # Basicly a monad
     def let(sym=nil, &block)
       @tries << ->(acc) { 
-        @context.instance_exec(acc, &block).tap do |value|
-          raise EitherExpectedError unless value.is_a? Either
+        @context.instance_exec(acc.value, &block).tap do |value|
+          raise EitherExpectedError, "Expected the result to be either Success or Failure" unless value.is_a? Either
         end
       }
     end
