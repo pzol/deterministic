@@ -40,6 +40,12 @@ describe Deterministic::Either::Match do
         success(Array) { |v| v.first }
       end
     ).to eq 1
+
+    expect(
+      Success(1).match do
+        success(Fixnum) { |v| v }
+      end
+    ).to eq 1
   end
 
   it "catch-all" do
@@ -63,6 +69,7 @@ describe Deterministic::Either::Match do
   it "can match with lambdas" do
     expect(
       Success(1).match do
+        failure                  { "not me" }
         success ->(v) { v == 1 } { |v| "matched #{v}" }
       end
     ).to eq "matched 1"

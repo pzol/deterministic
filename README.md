@@ -76,9 +76,9 @@ end # => "either 1"
 ```
 Note1: the inner value has been unwrapped! 
 
-Note2: only the __last__ matching pattern block will be executed, so order __can__ be important.
+Note2: only the __first__ matching pattern block will be executed, so order __can__ be important.
 
-The result returned will be the result of the __last__ `#try` or `#let`. As a side note, `#try` is a monad, `#let` is a functor.
+The result returned will be the result of the __first__ `#try` or `#let`. As a side note, `#try` is a monad, `#let` is a functor.
 
 Values for patterns are good, too:
 
