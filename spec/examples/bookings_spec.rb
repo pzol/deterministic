@@ -30,7 +30,6 @@ module Examples
       def initialize(world=FakeWebUi.new, deps=Dependencies.new)
         @world         = world
         @world.booking_list([])
-        @bookings_repo = deps.bookings_repo
       end
 
       def call(dirty_params)
