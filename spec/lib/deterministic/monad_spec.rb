@@ -26,7 +26,6 @@ describe Deterministic::Monad do
     it "passes the monad class, this is ruby-fu?!" do
      Identity.new(1)
       .bind do |_, monad|
-        p self.class
         expect(monad).to eq Identity
         monad.new(_)
       end
