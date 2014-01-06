@@ -1,12 +1,4 @@
 module Deterministic
-  def Success(value)
-    Success.new(value)
-  end
-
-  def Failure(value)
-    Failure.new(value)
-  end
-
   class Either
     include Monad
     include Deterministic::PatternMatching
@@ -23,5 +15,19 @@ module Deterministic
       return self if failure?
       return other if other.is_a? Either
     end
+
+    class << self
+      protected :new
+    end
+  end
+
+module_function
+
+  def Success(value)
+    Success.new(value)
+  end
+
+  def Failure(value)
+    Failure.new(value)
   end
 end

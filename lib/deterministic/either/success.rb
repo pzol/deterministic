@@ -1,3 +1,5 @@
 module Deterministic
-  class Success < Either; end
+  class Success < Either
+    class << self; public :new; end
+  end
 end
