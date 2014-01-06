@@ -3,7 +3,7 @@ shared_examples 'a Monad' do
     it '1st monadic law: left-identity' do
       f = ->(value) { monad.new(value + 1) }
       expect(
-        monad::new(1).bind do |value|
+        monad.new(1).bind do |value|
           f.(value)
         end
       ).to eq f.(1)
