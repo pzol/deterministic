@@ -16,7 +16,28 @@ describe Deterministic::Monad do
   specify { expect(Identity.new([1, 2]).map(&:to_s)).to eq Identity.new("[1, 2]") }
   specify { expect(Identity.new(1).map {|v| v + 2}).to eq Identity.new(3) }
   specify { expect(Identity.new('foo').map(&:upcase)).to eq Identity.new('FOO')}
-  specify { expect { Identity.new(1).bind {} }.to raise_error(Deterministic::Monad::NotMonadError) }
+
+  context '#bind' do
+    it "raises an error if the passed function does not return a monad of the same class" do 
+      expect { Identity.new(1).bind {} }.to raise_error(Deterministic::Monad::NotMonadError)
+    end
+    specify { expect(Identity.new(1).bind {|value| Identity.new(value) }).to eq Identity.new(1) }
+
+    it "passes the monad class, this is ruby-fu?!" do
+     Identity.new(1)
+      .bind do |_, monad|
+        p self.class
+        expect(monad).to eq Identity
+        monad.new(_)
+      end
+    end
+
+    specify { expect(
+      Identity.new(1).bind { |value, monad| monad.new(value + 1) }
+      ).to eq Identity.new(2)
+    }
+
+  end
   specify { expect(Identity.new(Identity.new(1))).to eq Identity.new(1) }
 
   # it 'delegates #flat_map to an underlying collection and wraps the resulting collection' do

@@ -21,13 +21,15 @@ module Deterministic
       self.class.new(result)
     end
 
-    # The monad: takes a function which returns a monad, applies
+    # The monad: takes a function which returns a monad (of the same type), applies the function
     # bind :: M a  -> (a -> Mb) -> M b
+    # the self.class, i.e. the containing monad is passed as a second (optional) arg to the function
     def bind(proc=nil, &block)
-      result = (proc || block).call(value)
-      raise NotMonadError unless result.is_a? Monad
-      self.class.new(result)
+      (proc || block).call(value, self.class).tap do |result|
+        raise NotMonadError unless result.is_a? self.class
+      end
     end
+    alias :'>>=' :bind
 
     # Get the underlying value, return in Haskell
     # return :: M a -> a

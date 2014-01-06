@@ -28,6 +28,4 @@ describe Deterministic::Success do
       subject.bind { |v| true ? Success(v + 1) : Failure(v + 2)}
     ).to eq Success(2)
   end
-
-  specify { expect { Success("a").bind(&:upcase) }.to raise_error(Deterministic::Monad::NotMonadError) }
 end
