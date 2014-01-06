@@ -1,6 +1,5 @@
 require 'spec_helper'
 require_relative 'monad_axioms'
-require 'deterministic'
 
 
 describe Deterministic::Monad do
