@@ -35,7 +35,7 @@ module Deterministic::PatternMatching
     end
 
   private
-    Matcher = Struct.new(:condition, :block) do 
+    Matcher = Struct.new(:condition, :block) do
       def matches?(value)
         condition.call(value)
       end
@@ -46,7 +46,7 @@ module Deterministic::PatternMatching
       when condition.nil?;          ->(v) { true }
       when condition.is_a?(Proc);   condition
       when condition.is_a?(Class);  ->(v) { condition === @container.value }
-      else                          ->(v) { condition == @container.value }
+      else                          ->(v) { @container.value == condition }
       end
 
       matcher_pred = compose_predicates(type_pred[type], condition_pred)
