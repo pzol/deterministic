@@ -9,7 +9,7 @@ describe Deterministic::Either::Match do
         success { |v| "Success #{v}" }
         failure { |v| "Failure #{v}" }
       end
-    ).to eq "Success 1" 
+    ).to eq "Success 1"
   end
 
   it "can match Failure" do
@@ -18,7 +18,7 @@ describe Deterministic::Either::Match do
         success { |v| "Success #{v}" }
         failure { |v| "Failure #{v}" }
       end
-    ).to eq "Failure 1" 
+    ).to eq "Failure 1"
   end
 
   it "can match with values" do
@@ -80,5 +80,25 @@ describe Deterministic::Either::Match do
         failure { "you'll never get me" }
       end
     }.to raise_error Deterministic::PatternMatching::NoMatchError
+  end
+
+  it "allows for Either values to play with pattern matching comparisons" do
+    class MyErrorHash < Hash
+      def ==(error_type_symbol)
+        self[:type] == error_type_symbol
+      end
+    end
+
+    error_hash = MyErrorHash.new.merge(:type => :needs_more_salt, :arbitrary => 'data')
+
+    expect(
+      Failure(error_hash).match do
+        failure(:nothing) {|v| raise "We should not get to this point" }
+        failure(:needs_more_salt) do |error|
+          "Successfully failed with #{error[:arbitrary]}!"
+        end
+        failure { raise "We should also not get to this point" }
+      end
+    ).to eq "Successfully failed with data!"
   end
 end
