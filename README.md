@@ -72,7 +72,7 @@ Success(1).match do
   success { |v| "success #{v}"}
   failure { |v| "failure #{v}"}
   either  { |v| "either #{v}"}
-end # => "either 1"
+end # => "success 1"
 ```
 Note1: the inner value has been unwrapped! 
 
@@ -84,7 +84,7 @@ Values for patterns are good, too:
 
 ```ruby
 Success(1).match do
-  success(1) { "Success #{v}" }
+  success(1) {|v| "Success #{v}" }
 end # => "Success 1"
 ```
 
@@ -92,7 +92,7 @@ You can and should also use procs for patterns:
 
 ```ruby
 Success(1).match do
-  success ->(v) { v == 1} { "Success #{v}" }
+  success ->(v) { v == 1 } {|v| "Success #{v}" }
 end # => "Success 1"
 ```
 
