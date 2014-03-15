@@ -82,6 +82,17 @@ describe Deterministic::Either::Match do
     }.to raise_error Deterministic::PatternMatching::NoMatchError
   end
 
+  it "can use methods from the caller's binding scope by default" do
+    def my_method
+      "it works"
+    end
+    expect(
+      Success(1).match do
+        success { my_method }
+      end
+    ).to eq "it works"
+  end
+
   it "allows for Either values to play with pattern matching comparisons" do
     class MyErrorHash < Hash
       def ==(error_type_symbol)
