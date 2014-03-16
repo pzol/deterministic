@@ -1,6 +1,7 @@
 module Deterministic::PatternMatching
 
-  def match(context=self, &block)
+  def match(context=nil, &block)
+    context ||= block.binding.eval('self')
     match = Match.new(self, context)
     match.instance_eval &block
     match.result
