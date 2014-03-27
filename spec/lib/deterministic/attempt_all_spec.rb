@@ -29,7 +29,7 @@ describe Deterministic::Either::AttemptAll do
     expect(attempt).to be_a RuntimeError
     expect(attempt.message).to eq "error"
   end
-  
+
   it "don't continue on failure" do
     fake = double()
     expect(

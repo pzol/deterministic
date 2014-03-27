@@ -132,6 +132,59 @@ Success(1).match do
 end # => "catch-all"
 ```
 
+## core_ext
+You can use a core extension, to include Either in your own class or in Object, i.e. in all classes.
+
+In a class, as a mixin
+
+```ruby
+require "deterministic/core_ext/either" # this includes Deterministic in the global namespace!
+class UnderTest
+  include Deterministic::CoreExt::Either
+  def test
+    attempt_all do
+      try { foo }
+    end
+  end
+
+  def foo
+    1
+  end
+end
+
+ut = UnderTest.new
+```
+
+To add it to all classes
+
+```ruby
+require "deterministic/core_ext/object/either" # this includes Deterministic  to Object
+
+class UnderTest
+  def test
+    attempt_all do
+      try { foo }
+    end
+  end
+
+  def foo
+    1
+  end
+end
+
+ut = UnderTest.new
+```
+
+or use it on built-in classes
+
+```ruby
+require "deterministic/core_ext/object/either"
+h = {a:1}
+h.attempt_all do
+  try { |s| self[:a] + 1}
+end
+```
+
 ## Inspirations
  * My [Monadic gem](http://github.com/pzol/monadic) of course
  * `#attempt_all` was somewhat inspired by [An error monad in Clojure](http://brehaut.net/blog/2011/error_monads)

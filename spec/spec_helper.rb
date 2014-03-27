@@ -20,5 +20,7 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
   config.order = 'random'
+
+  config.filter_run_excluding isolate: true
 end
 require 'deterministic'

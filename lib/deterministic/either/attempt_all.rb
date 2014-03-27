@@ -14,7 +14,7 @@ class Deterministic::Either
     end
 
     def call(initial=nil)
-      result = @tries.inject(Success(initial)) do |acc, try|
+      result = @tries.inject(Deterministic::Success(initial)) do |acc, try|
         acc.success? ? acc << try.call(acc) : acc
       end
     end
@@ -24,9 +24,9 @@ class Deterministic::Either
       try_p = ->(acc) {
         begin
           value = @context.instance_exec(acc.value, &block)
-          Success(value)
+          Deterministic::Success(value)
         rescue => ex
-          Failure(ex)
+          Deterministic::Failure(ex)
         end
       }
 
@@ -35,7 +35,7 @@ class Deterministic::Either
 
     # Basicly a monad
     def let(sym=nil, &block)
-      @tries << ->(acc) { 
+      @tries << ->(acc) {
         @context.instance_exec(acc.value, &block).tap do |value|
           raise EitherExpectedError, "Expected the result to be either Success or Failure" unless value.is_a? Either
         end
