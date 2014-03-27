@@ -25,7 +25,7 @@ module Deterministic::PatternMatching
     # TODO: Either specific DSL, will need to move it to Either, later on
     %w[Success Failure Either].each do |s|
       define_method s.downcase.to_sym do |value=nil, &block|
-        klas = Module.const_get(s)
+        klas = Deterministic.const_get(s)
         push(klas, value, block)
       end
     end

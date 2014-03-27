@@ -1,11 +1,9 @@
 require 'spec_helper'
 require_relative '../monad_axioms'
 
-include Deterministic
+describe Deterministic::Success, :include_helpers => true do
 
-describe Deterministic::Success do
-
-  it_behaves_like 'a Monad' do 
+  it_behaves_like 'a Monad' do
     let(:monad) { described_class }
   end
 

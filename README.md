@@ -6,11 +6,35 @@ This gem is still __WORK IN PROGRESS__.
 
 ## Usage
 
+The first think you need to do is include the helpers:
+
+```
+include Deterministic::Helpers
+```
+
+This will include **three** methods: the `Success` & `Failure` method helpers, and the `attempt_all` helper.
+
+If you prefer not to use the helpers, here are the equivalents:
+
+```ruby
+# attempt_all do
+# end
+Deterministic::Either.attempt_all do
+end
+
+# Success(:some_val)
+Deterministic::Success.new(:some_val)
+
+# Failure(:some_val)
+Deterministic::Failure.new(:some_val)
+```
+
 ### Either#attempt_all
+
 The basic idea is to execute a chain of units of work and make sure all return either `Success` or `Failure`.
 
 ```ruby
-Either.attempt_all do
+attempt_all do
   try { 1 }
   try { |prev| prev + 1 }
 end # => Success(2)
@@ -20,7 +44,7 @@ Take notice, that the result of of unit of work will be passed to the next one. 
 If any of the units of work in between fail, the rest will not be executed and the last `Failure` will be returned.
 
 ```ruby
-Either.attempt_all do
+attempt_all do
   try { 1 }
   try { raise "error" }
   try { 2 }
@@ -47,7 +71,7 @@ However, the real fun starts if you use it with your own context. You can use th
     end
   end
 
-  Either.attempt_all(context) do
+  attempt_all(context) do
     # this unit of work explicitly returns success or failure
     # no exceptions are catched and if they occur, well, they behave as expected
     # methods from the context can be accessed, the use of self for setters is necessary
@@ -107,7 +131,7 @@ end # => 1
 Combining `#attempt_all` and `#match` is the ultimate sophistication:
 
 ```ruby
-Either.attempt_all do
+attempt_all do
   try { 1 }
   try { |v| v + 1 }
 end.match do

@@ -1,8 +1,6 @@
 require 'spec_helper'
 
-include Deterministic
-
-describe Deterministic::Either::Match do
+describe Deterministic::Either::Match, :include_helpers => true do
   it "can match Success" do
     expect(
       Success(1).match do

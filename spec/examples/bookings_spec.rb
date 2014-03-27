@@ -1,8 +1,6 @@
 require 'spec_helper'
 require 'deterministic'
 
-include Deterministic
-
 module Examples
   module Bookings
 
@@ -27,13 +25,15 @@ module Examples
     end
 
     class ShowBookings
+      include Deterministic::Helpers
+
       def initialize(world=FakeWebUi.new, deps=Dependencies.new)
         @world         = world
         @world.booking_list([])
       end
 
       def call(dirty_params)
-        result = Either.attempt_all(self) do
+        result = attempt_all(self) do
           try {          parse_params(dirty_params) }
           let { |params| read_bookings(params)           }
         end.match(world) do
@@ -56,7 +56,7 @@ module Examples
         bookings = [params]
         case bookings
           when nil; Failure(:no_bookings)
-          when bookings.count == 1; 
+          when bookings.count == 1;
           else Success(bookings)
         end
       end
