@@ -1,7 +1,7 @@
 module Deterministic
   class Either
     include Monad
-    include Deterministic::PatternMatching
+    include PatternMatching
 
     def success?
       is_a? Success
@@ -19,15 +19,5 @@ module Deterministic
     class << self
       protected :new
     end
-  end
-
-module_function
-
-  def Success(value)
-    Success.new(value)
-  end
-
-  def Failure(value)
-    Failure.new(value)
   end
 end

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Deterministic::Either do
+describe Deterministic::Either, :include_helpers => true do
   it "can't call Either#new directly" do
    expect { described_class.new(1)}
     .to raise_error(NoMethodError, "protected method `new' called for Deterministic::Either:Class")

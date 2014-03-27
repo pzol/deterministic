@@ -1,7 +1,9 @@
 require 'simplecov'
 SimpleCov.start
+require 'deterministic'
 
 RSpec.configure do |config|
+  config.include Deterministic::Helpers, :include_helpers => true
   # Limit the spec run to only specs with the focus metadata. If no specs have
   # the filtering metadata and `run_all_when_everything_filtered = true` then
   # all specs will run.
@@ -19,6 +21,5 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
-  config.order = 'random'
+  # config.order = 'random'
 end
-require 'deterministic'

@@ -2,12 +2,12 @@ require 'spec_helper'
 require_relative 'monad_axioms'
 
 
-describe Deterministic::Monad do
-  class Identity 
+describe Deterministic::Monad, :include_helpers => true do
+  class Identity
     include Deterministic::Monad
   end
 
-  it_behaves_like 'a Monad' do 
+  it_behaves_like 'a Monad' do
     let(:monad) { Identity }
   end
 
@@ -18,7 +18,7 @@ describe Deterministic::Monad do
   specify { expect(Identity.new('foo').map(&:upcase)).to eq Identity.new('FOO')}
 
   context '#bind' do
-    it "raises an error if the passed function does not return a monad of the same class" do 
+    it "raises an error if the passed function does not return a monad of the same class" do
       expect { Identity.new(1).bind {} }.to raise_error(Deterministic::Monad::NotMonadError)
     end
     specify { expect(Identity.new(1).bind {|value| Identity.new(value) }).to eq Identity.new(1) }
