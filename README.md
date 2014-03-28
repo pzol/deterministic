@@ -189,10 +189,26 @@ h.attempt_all do
 end # => Success(2)
 ```
 
+## Maybe
+The simplest NullObject wrapper there can be. It adds `#some?` and `#none?` to `Object` though.
+
+```ruby
+maybe(nil).foo        # => None
+maybe(nil).foo.bar    # => None
+
+maybe({a: 1})[:a]     # => 1
+
+maybe(nil).none?      # => true
+maybe({}).none?       # => false
+
+maybe(nil).some?      # => false
+maybe({}).some?       # => true
+```
+
 ## Inspirations
  * My [Monadic gem](http://github.com/pzol/monadic) of course
  * `#attempt_all` was somewhat inspired by [An error monad in Clojure](http://brehaut.net/blog/2011/error_monads)
- * [Pithyless' rumblings](https://gist.github.com/pithyless/2216519) 
+ * [Pithyless' rumblings](https://gist.github.com/pithyless/2216519)
  * [either by rsslldnphy](https://github.com/rsslldnphy/either)
  * [Functors, Applicatives, And Monads In Pictures](http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html)
 

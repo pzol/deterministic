@@ -1,7 +1,7 @@
 # The simplest NullObject there can be
-class Nothing
+class None
   def self.instance
-    @instance ||= Nothing.new
+    @instance ||= None.new
   end
 
   # def respond_to_missing
@@ -10,8 +10,12 @@ class Nothing
     self
   end
 
-  def nothing?
+  def none?
     true
+  end
+
+  def some?
+    false
   end
 
   def respond_to?(m)
@@ -20,11 +24,15 @@ class Nothing
 end
 
 class Object
-  def nothing?
+  def none?
     false
+  end
+
+  def some?
+    true
   end
 end
 
 def maybe(obj)
-  obj.nil? ? Nothing.instance : obj
+  obj.nil? ? None.instance : obj
 end
