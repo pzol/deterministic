@@ -24,7 +24,7 @@ describe Deterministic::CoreExt::Either do
     h = {a: 1}
     h.extend(Deterministic::CoreExt::Either)
     res = h.attempt_all do
-      try { |s| self[:a] + 1}
+      try { |s| s[:a] + 1}
     end
 
     expect(res).to eq Deterministic::Success(2)
