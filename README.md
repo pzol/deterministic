@@ -194,16 +194,15 @@ The simplest NullObject wrapper there can be. It adds `#some?` and `#none?` to `
 
 ```ruby
 require 'deterministic/maybe' # you need to do this explicitly
-maybe(nil).foo        # => None
-maybe(nil).foo.bar    # => None
+Maybe(nil).foo        # => None
+Maybe(nil).foo.bar    # => None
+Mmaybe({a: 1})[:a]     # => 1
 
-maybe({a: 1})[:a]     # => 1
+Maybe(nil).none?      # => true
+Maybe({}).none?       # => false
 
-maybe(nil).none?      # => true
-maybe({}).none?       # => false
-
-maybe(nil).some?      # => false
-maybe({}).some?       # => true
+Maybe(nil).some?      # => false
+Maybe({}).some?       # => true
 ```
 
 ## Inspirations

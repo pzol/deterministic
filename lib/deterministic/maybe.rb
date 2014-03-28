@@ -33,6 +33,6 @@ class Object
   end
 end
 
-def maybe(obj)
+def Maybe(obj)
   obj.nil? ? None.instance : obj
 end
