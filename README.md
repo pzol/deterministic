@@ -8,8 +8,21 @@ This gem is still __WORK IN PROGRESS__.
 
 ## Usage
 
+### Success & Failure
+
+```ruby
+Success(1).to_s             # => "1"
+Success(1) << Success(2)    # => Success(2)
+Success(Success(1))         # => Success(1)
+Success(1).map { |v| v + 1} # => Success(2)
 Success({a:1}).to_json      # => '{"Success": {"a":1}}'
+
+Failure(1).to_s             # => "1"
+Failure(1) << Failure(2)    # => Failure(1)
+Failure(Failure(1))         # => Failure(1)
+Failure(1).map { |v| v + 1} # => Failure(2)
 Failure({a:1}).to_json      # => '{"Failure": {"a":1}}'
+
 ### Either#attempt_all
 The basic idea is to execute a chain of units of work and make sure all return either `Success` or `Failure`.
 
