@@ -155,6 +155,7 @@ class UnderTest
 end
 
 ut = UnderTest.new
+ut.test # => Success(1)
 ```
 
 To add it to all classes
@@ -175,6 +176,7 @@ class UnderTest
 end
 
 ut = UnderTest.new
+ut.test # => Success(1)
 ```
 
 or use it on built-in classes
@@ -183,8 +185,8 @@ or use it on built-in classes
 require "deterministic/core_ext/object/either"
 h = {a:1}
 h.attempt_all do
-  try { |s| self[:a] + 1}
-end
+  try { |s| s[:a] + 1}
+end # => Success(2)
 ```
 
 ## Inspirations
