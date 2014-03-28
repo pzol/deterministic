@@ -193,6 +193,7 @@ end # => Success(2)
 The simplest NullObject wrapper there can be. It adds `#some?` and `#none?` to `Object` though.
 
 ```ruby
+require 'deterministic/maybe' # you need to do this explicitly
 maybe(nil).foo        # => None
 maybe(nil).foo.bar    # => None
 
