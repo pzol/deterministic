@@ -205,12 +205,27 @@ Maybe(nil).some?      # => false
 Maybe({}).some?       # => true
 ```
 
+## Mimic
+
+If you want a custom NullObject which mimicks another class
+
+```ruby
+class Mimick
+  def test; end
+end
+
+null = Maybe.mimick(Mimick)
+null.test             # => None
+null.foo              # => NoMethodError
+```
+
 ## Inspirations
  * My [Monadic gem](http://github.com/pzol/monadic) of course
  * `#attempt_all` was somewhat inspired by [An error monad in Clojure](http://brehaut.net/blog/2011/error_monads)
  * [Pithyless' rumblings](https://gist.github.com/pithyless/2216519)
  * [either by rsslldnphy](https://github.com/rsslldnphy/either)
  * [Functors, Applicatives, And Monads In Pictures](http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html)
+ * [Naught by avdi](https://github.com/avdi/naught/)
 
 ## Installation
 

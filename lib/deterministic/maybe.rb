@@ -1,13 +1,40 @@
 # The simplest NullObject there can be
 class None
-  def self.instance
-    @instance ||= None.new
+  class << self
+    def method_missing(m, *args)
+      if m == :new
+        super
+      else
+        None.instance.send(m, *args)
+      end
+    end
+
+    def instance
+      @instance ||= new([])
+    end
+
+    def mimic(klas)
+      new(klas.instance_methods(false))
+    end
+  end
+  private_class_method :new
+
+  def initialize(methods)
+    @methods = methods
   end
 
-  # def respond_to_missing
+  # implicit conversions
+  def to_str
+    ''
+  end
 
-  def method_missing(*args)
-    self
+  def to_ary
+    []
+  end
+
+  def method_missing(m, *args)
+    return self if respond_to?(m)
+    super
   end
 
   def none?
@@ -19,7 +46,8 @@ class None
   end
 
   def respond_to?(m)
-    true
+    return true if @methods.empty? || @methods.include?(m)
+    super
   end
 end
 
