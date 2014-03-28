@@ -19,6 +19,15 @@ module Deterministic
     class << self
       protected :new
     end
+
+    def to_json
+      name = self.class.name.split('::')[-1]
+      "{\"#{name}\":#{value.to_json}}"
+    end
+
+    def to_s
+      value.to_s
+    end
   end
 
 module_function

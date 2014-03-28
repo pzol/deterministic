@@ -8,6 +8,8 @@ This gem is still __WORK IN PROGRESS__.
 
 ## Usage
 
+Success({a:1}).to_json      # => '{"Success": {"a":1}}'
+Failure({a:1}).to_json      # => '{"Failure": {"a":1}}'
 ### Either#attempt_all
 The basic idea is to execute a chain of units of work and make sure all return either `Success` or `Failure`.
 
