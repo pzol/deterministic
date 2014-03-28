@@ -20,9 +20,9 @@ module Deterministic
       protected :new
     end
 
-    def to_json
+    def to_json(*args)
       name = self.class.name.split('::')[-1]
-      "{\"#{name}\":#{value.to_json}}"
+      "{\"#{name}\":#{value.to_json(*args)}}"
     end
 
     def to_s

@@ -31,6 +31,7 @@ describe Deterministic::Success do
 
   it "#to_json" do
     expect(Success({a: 1}).to_json).to eq '{"Success":{"a":1}}'
+    expect([Success(1)].to_json).to eq '[{"Success":1}]'
   end
 
   it "#to_s" do
