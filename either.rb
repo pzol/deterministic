@@ -6,39 +6,39 @@ class Either
 		@value = value
 		return self
 	end
-	
+
 	def self.success(value)
 		Success.new(value)
 	end
-	
+
 	def self.failure(value)
 		Failure.new(value)
 	end
-	
+
 	class Abstract
 		def initialize(value)
 			@value = value
 		end
 	end
-	
+
 	class Success < Abstract
 		def <<(value)
 			@value = value
 		end
-			
+
 		def or(*args)
 			self
 		end
-		
+
 		def success?
 			true
 		end
-		
+
 		def failure?
 			false
 		end
 	end
-	
+
 	class Failure < Abstract
 		def <<(value)
 			@value = value
@@ -51,7 +51,7 @@ class Either
 		def success?
 			false
 		end
-		
+
 		def failure?
 			true
 		end
@@ -63,7 +63,7 @@ class Builder
 	def initialize(deps)
 		@settings_adapter = deps.fetch(:settings)
 	end
-	
+
 	def build
 		Either.new do
 			on_failure do |result|
@@ -73,7 +73,7 @@ class Builder
 			chain { @settings = @settings_adapter.call(a, b) }
 		end
 	end
-	
+
 end
 
 module SettingsAdapter
