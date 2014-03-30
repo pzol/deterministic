@@ -222,7 +222,7 @@ Maybe({}).some?       # => true
 
 ## Mimic
 
-If you want a custom NullObject which mimicks another class
+If you want a custom NullObject which mimicks another class.
 
 ```ruby
 class Mimick
