@@ -2,9 +2,10 @@
 
 [![Gem Version](https://badge.fury.io/rb/deterministic.png)](http://badge.fury.io/rb/deterministic)
 
+Deterministic is to help your code to be more confident, it's specialty is flow control of actions that either succeed or fail.
+
 This is a spiritual successor of the [Monadic gem](http://github.com/pzol/monadic). The goal of the rewrite is to get away from a bit to forceful aproach I took in Monadic, especially when it comes to coercing monads, but also a more practical but at the same time more strict adherence to monad laws.
 
-This gem is still __WORK IN PROGRESS__.
 
 ## Usage
 
@@ -23,6 +24,30 @@ Failure(Failure(1))         # => Failure(1)
 Failure(1).map { |v| v + 1} # => Failure(2)
 Failure({a:1}).to_json      # => '{"Failure": {"a":1}}'
 ```
+
+Chaininig successful actions
+
+```ruby
+Success(1).and Success(2)            # => Success(2)
+Success(1).and_then { Success(2) }   # => Success(2)
+
+Success(1).or Success(2)             # => Success(1)
+Success(1).or_else { Success(2) }    # => Success(1)
+```
+
+Chaininig failed actions
+
+```ruby
+Failure(1).and Success(2)            # => Failure(1)
+Failure(1).and_then { Success(2) }   # => Failure(1)
+
+Failure(1).or Success(1)             # => Success(1)
+Failure(1).or_else { |v| Success(v)} # => Success(1)
+```
+
+The value or block result must always be a `Success` or `Failure`
+
+
 
 ### Either.attempt_all
 The basic idea is to execute a chain of units of work and make sure all return either `Success` or `Failure`.
@@ -150,30 +175,6 @@ Success(1).match do
 end # => "catch-all"
 ```
 
-## Flow control
-
-Chaininig successfull actions
-
-```ruby
-Success(1).and Success(2)            # => Success(2)
-Success(1).and_then { Success(2) }   # => Success(2)
-
-Success(1).or Success(2)             # => Success(1)
-Success(1).or_else { Success(2) }    # => Success(1)
-```
-
-Chaininig failed actions
-
-```ruby
-Failure(1).and Success(2)            # => Failure(1)
-Failure(1).and_then { Success(2) }   # => Failure(1)
-
-Failure(1).or Success(1)             # => Success(1)
-Failure(1).or_else { |v| Success(v)} # => Success(1)
-```
-
-The value or block result must always be a `Success` or `Failure`
-
 ## core_ext
 You can use a core extension, to include Either in your own class or in Object, i.e. in all classes.
 
@@ -266,6 +267,7 @@ null.foo              # => NoMethodError
  * [either by rsslldnphy](https://github.com/rsslldnphy/either)
  * [Functors, Applicatives, And Monads In Pictures](http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html)
  * [Naught by avdi](https://github.com/avdi/naught/)
+ * [Rust's Result](http://static.rust-lang.org/doc/master/std/result/enum.Result.html)
 
 ## Installation
 
