@@ -1,7 +1,14 @@
 module Deterministic
+  # Abstract parent of Success and Failure
   class Either
     include Monad
     include Deterministic::PatternMatching
+
+    def bind(proc=nil, &block)
+      (proc || block).call(value, self.class).tap do |result|
+        raise NotMonadError, "Expected #{result.inspect} to be an Either" unless result.is_a? self.class.superclass
+      end
+    end
 
     def success?
       is_a? Success
@@ -16,6 +23,7 @@ module Deterministic
       return other if other.is_a? Either
     end
 
+    # This is an abstract class, can't ever instantiate it directly
     class << self
       protected :new
     end

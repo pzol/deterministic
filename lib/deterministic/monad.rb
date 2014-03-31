@@ -26,7 +26,7 @@ module Deterministic
     # the self.class, i.e. the containing monad is passed as a second (optional) arg to the function
     def bind(proc=nil, &block)
       (proc || block).call(value, self.class).tap do |result|
-        raise NotMonadError unless result.is_a? self.class
+        raise NotMonadError, "Expected #{result.inspect} to be an Either" unless result.is_a? self.class
       end
     end
     alias :'>>=' :bind

@@ -22,8 +22,9 @@ Failure(1) << Failure(2)    # => Failure(1)
 Failure(Failure(1))         # => Failure(1)
 Failure(1).map { |v| v + 1} # => Failure(2)
 Failure({a:1}).to_json      # => '{"Failure": {"a":1}}'
+```
 
-### Either#attempt_all
+### Either.attempt_all
 The basic idea is to execute a chain of units of work and make sure all return either `Success` or `Failure`.
 
 ```ruby
@@ -148,6 +149,30 @@ Success(1).match do
   any { "catch-all" }
 end # => "catch-all"
 ```
+
+## Flow control
+
+Chaininig successfull actions
+
+```ruby
+Success(1).and Success(2)            # => Success(2)
+Success(1).and_then { Success(2) }   # => Success(2)
+
+Success(1).or Success(2)             # => Success(1)
+Success(1).or_else { Success(2) }    # => Success(1)
+```
+
+Chaininig failed actions
+
+```ruby
+Failure(1).and Success(2)            # => Failure(1)
+Failure(1).and_then { Success(2) }   # => Failure(1)
+
+Failure(1).or Success(1)             # => Success(1)
+Failure(1).or_else { |v| Success(v)} # => Success(1)
+```
+
+The value or block result must always be a `Success` or `Failure`
 
 ## core_ext
 You can use a core extension, to include Either in your own class or in Object, i.e. in all classes.
