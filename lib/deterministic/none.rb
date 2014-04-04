@@ -5,7 +5,7 @@ class None
       if m == :new
         super
       else
-        None.instance.send(m, *args)
+        None.instance
       end
     end
 
