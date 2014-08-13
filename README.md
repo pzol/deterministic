@@ -25,7 +25,7 @@ Failure(1).map { |v| v + 1} # => Failure(2)
 Failure({a:1}).to_json      # => '{"Failure": {"a":1}}'
 ```
 
-Chaininig successful actions
+Chaining successful actions
 
 ```ruby
 Success(1).and Success(2)            # => Success(2)
@@ -35,7 +35,7 @@ Success(1).or Success(2)             # => Success(1)
 Success(1).or_else { Success(2) }    # => Success(1)
 ```
 
-Chaininig failed actions
+Chaining failed actions
 
 ```ruby
 Failure(1).and Success(2)            # => Failure(1)
