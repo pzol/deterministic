@@ -24,7 +24,12 @@ class Deterministic::Either
       try_p = ->(acc) {
         begin
           value = @context.instance_exec(acc.value, &block)
-          Deterministic::Success(value)
+          case value
+          when Success, Failure
+            value
+          else
+            Deterministic::Success(value)
+          end
         rescue => ex
           Deterministic::Failure(ex)
         end

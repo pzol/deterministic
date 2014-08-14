@@ -72,6 +72,16 @@ describe Deterministic::Either::AttemptAll do
     ).to eq Success(2)
   end
 
+
+  it "works with boxed values" do
+    expect(
+      Either.attempt_all do
+        try { Failure(1) }
+        try { 2 }
+      end
+    ).to eq Failure(1)
+  end
+
   it "works with an OpenStruct" do
     context = OpenStruct.new
     attempt = Either.attempt_all(context) do
