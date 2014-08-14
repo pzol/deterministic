@@ -25,7 +25,7 @@ class Deterministic::Either
         begin
           value = @context.instance_exec(acc.value, &block)
           case value
-          when Success, Failure
+          when Deterministic::Success, Deterministic::Failure
             value
           else
             Deterministic::Success(value)
