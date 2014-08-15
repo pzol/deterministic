@@ -8,21 +8,4 @@ describe Deterministic::CoreExt::Either, "object", isolate: true do
     expect(h.failure?).to be_falsey
     expect(h.either?).to be_falsey
   end
-
-  it "use attempt_all in an instance" do
-    class UnderTest
-      def test
-        attempt_all do
-          try { foo }
-        end
-      end
-
-      def foo
-        1
-      end
-    end
-
-    ut = UnderTest.new
-    expect(ut.test).to eq Success(1)
-  end
 end

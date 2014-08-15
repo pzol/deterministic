@@ -117,60 +117,6 @@ end
 Success(1) >= method(:error) # Failure(RuntimeError(error 1))
 ```
 
-### Either.attempt_all
-The basic idea is to execute a chain of units of work and make sure all return either `Success` or `Failure`.
-This remains for compatibility reasons, personally I would use the `>>` chaining.
-
-
-```ruby
-Either.attempt_all do
-  try { 1 }
-  try { |prev| prev + 1 }
-end # => Success(2)
-```
-Take notice, that the result of of unit of work will be passed to the next one. So the result of prepare_somehing will be something in the second try.
-
-If any of the units of work in between fail, the rest will not be executed and the last `Failure` will be returned.
-
-```ruby
-Either.attempt_all do
-  try { 1 }
-  try { raise "error" }
-  try { 2 }
-end # => Failure(RuntimeError("error"))
-```
-
-However, the real fun starts if you use it with your own context. You can use this as a state container (meh!) or to pass a dependency locator:
-
-```ruby
-  class Context
-    attr_accessor :env, :settings
-    def some_service
-    end
-  end
-
-  # exemplary unit of work
-  module LoadSettings
-    def self.call(env)
-      settings = load(env)
-      settings.nil? ? Failure('could not load settings') : Success(settings)
-    end
-
-    def load(env)
-    end
-  end
-
-  Either.attempt_all(context) do
-    # this unit of work explicitly returns success or failure
-    # no exceptions are catched and if they occur, well, they behave as expected
-    # methods from the context can be accessed, the use of self for setters is necessary
-    let { self.settings = LoadSettings.call(env) }
-
-    # with #try all exceptions will be transformed into a Failure
-    try { do_something }
-  end
-```
-
 ### Pattern matching
 Now that you have some result, you want to control flow by providing patterns.
 `#match` can match by

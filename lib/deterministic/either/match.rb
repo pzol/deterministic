@@ -18,7 +18,7 @@ module Deterministic::PatternMatching
 
     def result
       matcher = @collection.detect { |m| m.matches?(@container.value) }
-      raise NoMatchError, "No could be made for #{@container}" if matcher.nil?
+      raise NoMatchError, "No match could be made for #{@container.inspect}" if matcher.nil?
       @context.instance_exec(@container.value, &matcher.block)
     end
 

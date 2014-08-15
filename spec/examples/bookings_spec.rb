@@ -33,10 +33,8 @@ module Examples
       end
 
       def call(dirty_params)
-        result = Either.attempt_all(self) do
-          try {          parse_params(dirty_params) }
-          let { |params| read_bookings(params)           }
-        end.match(world) do
+
+        ( parse_params(dirty_params) >> method(:read_bookings) ).match(world) do
           success(Array)         { |bookings| booking_list(bookings) }
           success                { |booking|  booking(booking)       }
           failure(:no_bookings)  { empty_booking_list                }
@@ -49,7 +47,7 @@ module Examples
       attr_reader   :bookings_repo, :world
 
       def parse_params(dirty_params)
-        dirty_params
+        Success(dirty_params)
       end
 
       def read_bookings(params)
