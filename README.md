@@ -107,6 +107,16 @@ end
 Success(0) >> method(:works) >> method(:breaks) >> method(:never_executed) # Failure(2)
 ```
 
+`#chain` aka `#>>` will not catch any exceptions raised. If you want automatic exception handling, the `#try` aka `#>=` will catch an error and wrap it with a failure
+
+```ruby
+def error(ctx)
+  raise "error #{1}"
+end
+
+Success(1) >= method(:error) # Failure(RuntimeError(error 1))
+```
+
 ### Either.attempt_all
 The basic idea is to execute a chain of units of work and make sure all return either `Success` or `Failure`.
 This remains for compatibility reasons, personally I would use the `>>` chaining.

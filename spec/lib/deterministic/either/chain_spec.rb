@@ -3,13 +3,16 @@ require 'spec_helper'
 include Deterministic
 
 describe Deterministic::Either do
-  context ">>" do
+  context ">> (chain)" do
     it "Failure stops execution" do
       class ChainUnderTest
         alias :m :method
 
         def call
-          init >> m(:validate) >> m(:send) >> m(:parse)
+          init >> 
+            m(:validate) >> 
+            m(:send) >> 
+            m(:parse)
         end
 
         def init
@@ -55,6 +58,23 @@ describe Deterministic::Either do
       expect(
         Success(1) >> ->(i) { Success(i + 1) }
       ).to eq Success(2)
+    end
+
+    it "does not catch exceptions" do
+      expect {
+        Success(1) >> ->(i) { raise "error" }
+      }.to raise_error(RuntimeError)
+    end
+  end
+
+  context ">= (try)" do
+    it "try (>=) catches errors and wraps them as Failure" do
+      def error(ctx)
+        raise "error #{ctx}"
+      end
+
+      actual = Success(1) >= method(:error)
+      expect(actual.inspect).to eq "Failure(error 1)"
     end
   end
 end
