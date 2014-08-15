@@ -47,10 +47,70 @@ Failure(1).or_else { |v| Success(v)} # => Success(1)
 
 The value or block result must always be a `Success` or `Failure`
 
+### Either.chain
+You can easily chain the execution of several operations. Here we got some nice function composition.  
+The method must be a unary function, i.e. it always takes one parameter - the context, which is passed from call to call.
 
+```ruby
+class Foo
+  include Deterministic
+  alias :m :method
+
+  def call
+    setup >> m(:validate) >> m(:send)
+  end
+
+  def setup
+    Success(1)
+  end
+
+  def validate(ctx)
+    # do stuff
+    Success(ctx + 1)
+  end
+
+  def send(ctx)
+    # do stuff
+    Success(ctx + 1)
+  end
+end
+
+Foo.new.call # Success(3)
+```
+
+Chaining works with blocks (`#chain` is an alias for `#>>`)
+
+```ruby
+Success(1).chain {|ctx| Success(ctx + 1)}
+```
+
+it also works with lambdas
+```ruby
+Success(1) >> ->(ctx) { Success(ctx + 1) } >> ->(ctx) { Success(ctx + 1) }
+```
+
+and it will break the chain of execution, when it encounters a `Failure` on its way
+
+```ruby
+def works(ctx)
+  Success(1)
+end
+
+def breaks(ctx)
+  Failure(2)
+end
+
+def never_executed(ctx)
+  Success(99)
+end
+
+Success(0) >> method(:works) >> method(:breaks) >> method(:never_executed) # Failure(2)
+```
 
 ### Either.attempt_all
 The basic idea is to execute a chain of units of work and make sure all return either `Success` or `Failure`.
+This remains for compatibility reasons, personally I would use the `>>` chaining.
+
 
 ```ruby
 Either.attempt_all do

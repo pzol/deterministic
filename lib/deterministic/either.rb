@@ -3,6 +3,7 @@ module Deterministic
   class Either
     include Monad
     include Deterministic::PatternMatching
+    include Chain
 
     def bind(proc=nil, &block)
       (proc || block).call(value, self.class).tap do |result|
@@ -26,11 +27,6 @@ module Deterministic
     # This is an abstract class, can't ever instantiate it directly
     class << self
       protected :new
-    end
-
-    def to_json(*args)
-      name = self.class.name.split('::')[-1]
-      "{\"#{name}\":#{value.to_json(*args)}}"
     end
 
     def to_s

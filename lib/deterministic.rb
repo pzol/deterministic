@@ -6,6 +6,7 @@ module Deterministic; end
 
 require 'deterministic/monad'
 require 'deterministic/either/match'
+require 'deterministic/either/chain'
 require 'deterministic/either'
 require 'deterministic/either/attempt_all'
 require 'deterministic/either/success'
