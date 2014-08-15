@@ -14,10 +14,6 @@ module Deterministic
       def either?
         success? || failure?
       end
-
-      def attempt_all(context=self, &block)
-        Deterministic::Either::AttemptAll.new(context, &block).call(self)
-      end
     end
   end
 end
