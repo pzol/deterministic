@@ -11,10 +11,6 @@ shared_examples 'Either' do
     expect(either.new(1).bind { |v| either.new(v + 1)}).to eq either.new(2)
   end
 
-  it "#to_json" do
-    expect(either.new({a: 1}).to_json).to eq "{\"#{either_name}\":{\"a\":1}}"
-  end
-
   it "#to_s" do
     expect(either.new(1).to_s).to eq "1"
     expect(either.new({a: 1}).to_s).to eq "{:a=>1}"
