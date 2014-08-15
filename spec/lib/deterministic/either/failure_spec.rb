@@ -22,6 +22,12 @@ describe Deterministic::Failure do
   specify { expect(subject << Failure(2)).to eq(Failure(1)) }
   specify { expect(subject.map { |v| v + 1} ).to eq Failure(2) }
 
+  specify { expect(subject.or(Success(2))).to eq Success(2)}
+  specify { expect(subject.or_else { Success(2) }).to eq Success(2)}
+
+  specify { expect(subject.and(Success(2))).to eq Failure(1)}
+  specify { expect(subject.and_then { Success(2) }).to eq Failure(1)}
+
   it_behaves_like 'Either' do
     let(:either) { described_class }
   end
