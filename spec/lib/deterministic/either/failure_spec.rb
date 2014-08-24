@@ -20,7 +20,7 @@ describe Deterministic::Failure do
   specify { expect(subject).to eq(described_class.new(1)) }
   specify { expect(subject << Success(2)).to eq(Failure(1)) }
   specify { expect(subject << Failure(2)).to eq(Failure(1)) }
-  specify { expect(subject.map { |v| v + 1} ).to eq Failure(2) }
+  specify { expect(subject.fmap { |v| v + 1} ).to eq Failure(2) }
 
   specify { expect(subject.or(Success(2))).to eq Success(2)}
   specify { expect(subject.or_else { Success(2) }).to eq Success(2)}

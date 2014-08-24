@@ -15,12 +15,12 @@ This is a spiritual successor of the [Monadic gem](http://github.com/pzol/monadi
 Success(1).to_s             # => "1"
 Success(1) << Success(2)    # => Success(2)
 Success(Success(1))         # => Success(1)
-Success(1).map { |v| v + 1} # => Success(2)
+Success(1).fmap { |v| v + 1} # => Success(2)
 
 Failure(1).to_s             # => "1"
 Failure(1) << Failure(2)    # => Failure(1)
 Failure(Failure(1))         # => Failure(1)
-Failure(1).map { |v| v + 1} # => Failure(2)
+Failure(1).fmap { |v| v + 1} # => Failure(2)
 ```
 
 Chaining successful actions
@@ -188,7 +188,7 @@ The simplest NullObject wrapper there can be. It adds `#some?` and `#none?` to `
 require 'deterministic/maybe' # you need to do this explicitly
 Maybe(nil).foo        # => None
 Maybe(nil).foo.bar    # => None
-Mmaybe({a: 1})[:a]     # => 1
+Maybe({a: 1})[:a]     # => 1
 
 Maybe(nil).none?      # => true
 Maybe({}).none?       # => false

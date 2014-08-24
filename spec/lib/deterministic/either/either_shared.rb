@@ -3,8 +3,8 @@ shared_examples 'Either' do
   specify { expect(subject.value).to eq 1 }
   specify { expect(either.new(subject)).to eq either.new(1) }
 
-  it "#map" do
-    expect(either.new(1).map { |e| e + 1 }).to eq either.new(2)
+  it "#fmap" do
+    expect(either.new(1).fmap { |e| e + 1 }).to eq either.new(2)
   end
 
   it "#bind" do

@@ -11,6 +11,8 @@ describe 'maybe' do
     expect(Maybe({a: 1})[:a]).to eq 1
     expect(Maybe("a").upcase).to eq "A"
     expect(Maybe("a")).not_to be_none
+
+    # expect(Maybe[[]]).to eq be_none
   end
 
 end

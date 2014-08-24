@@ -16,7 +16,7 @@ module Deterministic
     # The functor: takes a function (a -> b) and applies it to the inner value of the monad (Ma),
     # boxes it back to the same monad (Mb)
     # fmap :: (a -> b) -> M a -> M b
-    def map(proc=nil, &block)
+    def fmap(proc=nil, &block)
       result = (proc || block).call(value)
       self.class.new(result)
     end

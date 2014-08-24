@@ -9,7 +9,7 @@ describe Deterministic::Either do
         alias :m :method
 
         def call
-          init >> 
+          init >>
             m(:validate) >> 
             m(:send) >> 
             m(:parse)
@@ -64,6 +64,43 @@ describe Deterministic::Either do
       expect {
         Success(1) >> ->(i) { raise "error" }
       }.to raise_error(RuntimeError)
+    end
+  end
+
+  context "using self as the context for success" do
+    class SelfContextUnderTest
+      def call
+        @step = 0
+        Success(self).
+          chain(&:validate).
+          chain(&:build).
+          chain(&:send)
+      end
+
+      def validate
+        @step = 1
+        Success(self)
+      end
+
+      def build
+        @step = 2
+        Success(self)
+      end
+
+      def send
+        @step = 3
+        Success(self)
+      end
+
+      def to_s
+        "Step #{@step}"
+      end
+    end
+
+    it "works" do
+      test = SelfContextUnderTest.new.call
+      expect(test).to be_a Success
+      expect(test.inspect).to eq "Success(Step 3)"
     end
   end
 

@@ -13,9 +13,9 @@ describe Deterministic::Monad do
 
   specify { expect(Identity.new(1).to_s).to  eq 'Identity(1)' }
   specify { expect(Identity.new(nil).to_s).to  eq 'Identity(nil)' }
-  specify { expect(Identity.new([1, 2]).map(&:to_s)).to eq Identity.new("[1, 2]") }
-  specify { expect(Identity.new(1).map {|v| v + 2}).to eq Identity.new(3) }
-  specify { expect(Identity.new('foo').map(&:upcase)).to eq Identity.new('FOO')}
+  specify { expect(Identity.new([1, 2]).fmap(&:to_s)).to eq Identity.new("[1, 2]") }
+  specify { expect(Identity.new(1).fmap {|v| v + 2}).to eq Identity.new(3) }
+  specify { expect(Identity.new('foo').fmap(&:upcase)).to eq Identity.new('FOO')}
 
   context '#bind' do
     it "raises an error if the passed function does not return a monad of the same class" do 
