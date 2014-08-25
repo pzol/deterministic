@@ -8,6 +8,11 @@ module Deterministic
 
       alias :>> :map
 
+      def map_err(proc=nil, &block)
+        return self if success?
+        bind(proc || block)
+      end
+
       def try(proc=nil, &block)
         map(proc, &block)
       rescue => err

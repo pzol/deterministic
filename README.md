@@ -12,11 +12,11 @@ This is a spiritual successor of the [Monadic gem](http://github.com/pzol/monadi
 ### Result: Success & Failure
 
 ```ruby
-Success(1).to_s             # => "1"
-Success(Success(1))         # => Success(1)
+Success(1).to_s                        # => "1"
+Success(Success(1))                    # => Success(1)
 
-Failure(1).to_s             # => "1"
-Failure(Failure(1))         # => Failure(1)
+Failure(1).to_s                        # => "1"
+Failure(Failure(1))                    # => Failure(1)
 ```
 
 #### `fmap :: R a -> (a -> b) -> R b`
@@ -24,17 +24,35 @@ Failure(Failure(1))         # => Failure(1)
 Maps a `Result` with the value `a` to the same `Result` with the value `b`.
 
 ```ruby
-Success(1).fmap { |v| v + 1} # => Success(2)
-Failure(1).fmap { |v| v + 1} # => Failure(2)
+Success(1).fmap { |v| v + 1}           # => Success(2)
+Failure(1).fmap { |v| v - 1}           # => Failure(0)
+```
+
+#### `bind :: R a -> (a -> R b) -> R b`
+
+Maps a `Result` with the value `a` to another `Result` with the value `b`.
+
+```ruby
+Success(1).bind { |v| Failure(v + 1) } # => Failure(2)
+Failure(1).fmap { |v| Success(v - 1) } # => Success(0)
 ```
 
 #### `map :: S a -> (a -> R b) -> R b`
 
-Maps a `Success` with the value `a` to another `Result` with the value `b`.
+Maps a `Success` with the value `a` to another `Result` with the value `b`. It works like `#bind` but only on `Success`.
 
 ```ruby
-Success(1).map { |n| Success(n + 1) } # => Success(2)
-Failure(0).map { |n| Success(n + 1) } # => Failure(0)
+Success(1).map { |n| n + 1 }           # => Success(2)
+Failure(0).map { |n| n + 1 }           # => Failure(0)
+```
+
+#### `map_err :: F a -> (a -> R b) -> R b`
+
+Maps a `Failure` with the value `a` to another `Result` with the value `b`. It works like `#bind` but only on `Failure`.
+
+```ruby
+Failure(1).map_err { |n| n + 1 } # => Success(2)
+Success(0).map_err { |n| n + 1 } # => Success(0)
 ```
 
 #### `try :: S a -> ( a -> R b) -> R b`
@@ -42,7 +60,7 @@ Failure(0).map { |n| Success(n + 1) } # => Failure(0)
 Just like `#map`, transforms `a` to another `Result`, but it will also catch raised exceptions and wrap them with a `Failure`.
 
 ```ruby
-Success(0).try { |n| raise "Error" }  # => Failure(Error)
+Success(0).try { |n| raise "Error" }   # => Failure(Error)
 ```
 
 #### `and :: S a -> R b -> R b`
