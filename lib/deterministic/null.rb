@@ -1,11 +1,11 @@
 # The simplest NullObject there can be
-class None
+class Null
   class << self
     def method_missing(m, *args)
       if m == :new
         super
       else
-        None.instance
+        Null.instance
       end
     end
 
@@ -13,7 +13,7 @@ class None
       @instance ||= new([])
     end
 
-    def none?
+    def null?
       true
     end
 
@@ -26,7 +26,7 @@ class None
     end
 
     def ==(other)
-      other.respond_to?(:none?) && other.none?
+      other.respond_to?(:null?) && other.null?
     end
   end
   private_class_method :new
@@ -49,7 +49,7 @@ class None
     super
   end
 
-  def none?
+  def null?
     true
   end
 
@@ -63,10 +63,10 @@ class None
   end
 
   def inspect
-    'None'
+    'Null'
   end
 
   def ==(other)
-    other.respond_to?(:none?) && other.none?
+    other.respond_to?(:null?) && other.null?
   end
 end

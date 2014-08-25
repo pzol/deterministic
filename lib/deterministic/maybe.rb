@@ -1,5 +1,5 @@
 class Object
-  def none?
+  def null?
     false
   end
 
@@ -9,5 +9,5 @@ class Object
 end
 
 def Maybe(obj)
-  obj.nil? ? None.instance : obj
+  obj.nil? ? Null.instance : obj
 end

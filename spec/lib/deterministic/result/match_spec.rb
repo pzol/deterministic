@@ -104,7 +104,7 @@ describe Deterministic::Result::Match do
 
     expect(
       Failure(error_hash).match do
-        failure(:nothing) {|v| raise "We should not get to this point" }
+        failure(:null) {|v| raise "We should not get to this point" }
         failure(:needs_more_salt) do |error|
           "Successfully failed with #{error[:arbitrary]}!"
         end
