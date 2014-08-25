@@ -4,7 +4,7 @@
 - Remove `Either#<<`
 - Rename `Either` to `Result`
 - Add `Result#pipe` aka `Result#**`
-
+- Add `Result#map` and `Result#map_err`
 
 ## v0.9.0
 ** breaking changes **
