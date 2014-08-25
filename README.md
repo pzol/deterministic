@@ -19,7 +19,7 @@ Failure(1).to_s             # => "1"
 Failure(Failure(1))         # => Failure(1)
 ```
 
-#### Functor `fmap :: R a -> (a -> b) -> R b`
+#### `fmap :: R a -> (a -> b) -> R b`
 
 Maps a `Result` with the value `a` to the same `Result` with the value `b`.
 
@@ -28,51 +28,65 @@ Success(1).fmap { |v| v + 1} # => Success(2)
 Failure(1).fmap { |v| v + 1} # => Failure(2)
 ```
 
-#### Monad `map :: R a -> (a -> R b) -> R b`
+#### `map :: S a -> (a -> R b) -> R b`
 
-Maps a `Result` with the value `a` to another `Result` with the value `b`.
+Maps a `Success` with the value `a` to another `Result` with the value `b`.
 
 ```ruby
 Success(1).map { |n| Success(n + 1) } # => Success(2)
 Failure(0).map { |n| Success(n + 1) } # => Failure(0)
 ```
 
-#### `and :: S a -> S b -> S b`
+#### `try :: S a -> ( a -> R b) -> R b`
 
-Replaces `Success a` with `Success b`. If a `Failure` is passed as argument, it is ignored.
+Just like `#map`, transforms `a` to another `Result`, but it will also catch raised exceptions and wrap them with a `Failure`.
+
+```ruby
+Success(0).try { |n| raise "Error" }  # => Failure(Error)
+```
+
+#### `and :: S a -> R b -> R b`
+
+Replaces `Success a` with `Result b`. If a `Failure` is passed as argument, it is ignored.
 
 ```ruby
 Success(1).and Success(2)            # => Success(2)
 Failure(1).and Success(2)            # => Failure(1)
 ```
 
-#### `and_then :: S a -> (a -> S b)`
+#### `and_then :: S a -> (a -> R b) -> R b`
 
-Replaces `Success a` with `Success b`. If a `Failure` is passed as argument, it is ignored.
+Replaces `Success a` with the result of the block. If a `Failure` is passed as argument, it is ignored.
 
 ```ruby
 Success(1).and_then { Success(2) }   # => Success(2)
 Failure(1).and_then { Success(2) }   # => Failure(1)
 ```
 
-#### `or`
+#### `or :: F a -> R b -> R b` 
+Replaces `Failure a` with `Result`. If a `Failure` is passed as argument, it is ignored.
 
 ```ruby
 Success(1).or Success(2)             # => Success(1)
 Failure(1).or Success(1)             # => Success(1)
 ```
 
-#### `or_else`
+#### `or_else :: F a -> (a -> R b) -> R b`
+
+Replaces `Failure a` with the result of the block. If a `Success` is passed as argument, it is ignored.
+
 ```ruby
 Success(1).or_else { Success(2) }    # => Success(1)
-Failure(1).or_else { |v| Success(v)} # => Success(1)
+Failure(1).or_else { |n| Success(n)} # => Success(1)
 ```
 
 The value or block result must always be a `Success` or `Failure`.
+### Result Chaining
 
-### Result.chain
 You can easily chain the execution of several operations. Here we got some nice function composition.  
 The method must be a unary function, i.e. it always takes one parameter - the context, which is passed from call to call.
+
+The following aliases are defined
 
 ```ruby
 class Foo
@@ -101,7 +115,7 @@ end
 Foo.new.call # Success(3)
 ```
 
-Chaining works with blocks (`#chain` is an alias for `#>>`)
+Chaining works with blocks (`#map` is an alias for `#>>`)
 
 ```ruby
 Success(1).chain {|ctx| Success(ctx + 1)}
@@ -130,7 +144,7 @@ end
 Success(0) >> method(:works) >> method(:breaks) >> method(:never_executed) # Failure(2)
 ```
 
-`#chain` aka `#>>` will not catch any exceptions raised. If you want automatic exception handling, the `#try` aka `#>=` will catch an error and wrap it with a failure
+`#map` aka `#>>` will not catch any exceptions raised. If you want automatic exception handling, the `#try` aka `#>=` will catch an error and wrap it with a failure
 
 ```ruby
 def error(ctx)
