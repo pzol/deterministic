@@ -19,6 +19,27 @@ module Deterministic
       is_a? Failure
     end
 
+    def and(other)
+      return self if failure?
+      raise NotMonadError, "Expected #{other.inspect} to be an Result" unless other.is_a? Result
+      other
+    end
+
+    def and_then(&block)
+      return self if failure?
+      bind(&block)
+    end
+
+    def or(other)
+      return self if success?
+      raise NotMonadError, "Expected #{other.inspect} to be an Result" unless other.is_a? Result
+      return other
+    end
+
+    def or_else(&block)
+      return self if success?
+      bind(&block)
+    end
 
     # This is an abstract class, can't ever instantiate it directly
     class << self
