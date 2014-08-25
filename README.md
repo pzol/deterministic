@@ -269,16 +269,16 @@ Failure(1).result?  # => true
 
 
 ## Maybe
-The simplest NullObject wrapper there can be. It adds `#some?` and `#none?` to `Object` though.
+The simplest NullObject wrapper there can be. It adds `#some?` and `#null?` to `Object` though.
 
 ```ruby
 require 'deterministic/maybe' # you need to do this explicitly
-Maybe(nil).foo        # => None
-Maybe(nil).foo.bar    # => None
+Maybe(nil).foo        # => Null
+Maybe(nil).foo.bar    # => Null
 Maybe({a: 1})[:a]     # => 1
 
-Maybe(nil).none?      # => true
-Maybe({}).none?       # => false
+Maybe(nil).null?      # => true
+Maybe({}).null?       # => false
 
 Maybe(nil).some?      # => false
 Maybe({}).some?       # => true
@@ -293,9 +293,9 @@ class Mimick
   def test; end
 end
 
-null = Maybe.mimick(Mimick)
-null.test             # => None
-null.foo              # => NoMethodError
+naught = Maybe.mimick(Mimick)
+naught.test             # => Null
+naught.foo              # => NoMethodError
 ```
 
 ## Inspirations
