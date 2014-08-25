@@ -80,7 +80,16 @@ Success(1).or_else { Success(2) }    # => Success(1)
 Failure(1).or_else { |n| Success(n)} # => Success(1)
 ```
 
-The value or block result must always be a `Success` or `Failure`.
+#### `pipe :: R a -> (R a -> b) -> R a`
+
+Executes the block passed, but completely ignores its result. If an error is raised within the block it will **NOT** be catched.
+
+```ruby
+Success(1).try { |n| log(n.value) }  # => Success(1)
+```
+
+The value or block result must always be a `Result` i.e. `Success` or `Failure`.
+
 ### Result Chaining
 
 You can easily chain the execution of several operations. Here we got some nice function composition.  

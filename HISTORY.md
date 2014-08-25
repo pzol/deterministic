@@ -3,6 +3,8 @@
 
 - Remove `Either#<<`
 - Rename `Either` to `Result`
+- Add `Result#pipe` aka `Result#**`
+
 
 ## v0.9.0
 ** breaking changes **

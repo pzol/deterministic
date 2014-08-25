@@ -119,6 +119,24 @@ describe Deterministic::Result do
     end
   end
 
+  context "** (pipe)" do
+    it "ignores the output of pipe" do
+      acc = "ctx: "
+      log = ->(ctx) { acc += ctx.inspect }
+
+      actual = Success(1).pipe(log).map { Success(2) }
+      expect(actual).to eq Success(2)
+      expect(acc).to eq "ctx: Success(1)"
+    end
+
+    it "works with **" do
+      log = ->(n) { n.value + 1 }
+      foo = ->(n) { Success(n + 1) }
+
+      actual = Success(1) ** log >> foo 
+    end
+  end
+
   context ">= (try)" do
     it "try (>=) catches errors and wraps them as Failure" do
       def error(ctx)

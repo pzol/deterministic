@@ -19,6 +19,13 @@ module Deterministic
       is_a? Failure
     end
 
+    def pipe(proc=nil, &block)
+      (proc || block).call(self)
+      self
+    end
+
+    alias :** :pipe
+
     def and(other)
       return self if failure?
       raise NotMonadError, "Expected #{other.inspect} to be an Result" unless other.is_a? Result
@@ -57,7 +64,6 @@ module Deterministic
   end
 
 module_function
-
   def Success(value)
     Success.new(value)
   end
