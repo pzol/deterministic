@@ -9,41 +9,68 @@ This is a spiritual successor of the [Monadic gem](http://github.com/pzol/monadi
 
 ## Usage
 
-### Success & Failure
+### Result: Success & Failure
 
 ```ruby
 Success(1).to_s             # => "1"
 Success(Success(1))         # => Success(1)
-Success(1).fmap { |v| v + 1} # => Success(2)
 
 Failure(1).to_s             # => "1"
 Failure(Failure(1))         # => Failure(1)
+```
+
+#### Functor `fmap :: R a -> (a -> b) -> R b`
+
+Maps a `Result` with the value `a` to the same `Result` with the value `b`.
+
+```ruby
+Success(1).fmap { |v| v + 1} # => Success(2)
 Failure(1).fmap { |v| v + 1} # => Failure(2)
 ```
 
-Chaining successful actions
+#### Monad `map :: R a -> (a -> R b) -> R b`
+
+Maps a `Result` with the value `a` to another `Result` with the value `b`.
+
+```ruby
+Success(1).map { |n| Success(n + 1) } # => Success(2)
+Failure(0).map { |n| Success(n + 1) } # => Failure(0)
+```
+
+#### `and :: S a -> S b -> S b`
+
+Replaces `Success a` with `Success b`. If a `Failure` is passed as argument, it is ignored.
 
 ```ruby
 Success(1).and Success(2)            # => Success(2)
-Success(1).and_then { Success(2) }   # => Success(2)
-
-Success(1).or Success(2)             # => Success(1)
-Success(1).or_else { Success(2) }    # => Success(1)
+Failure(1).and Success(2)            # => Failure(1)
 ```
 
-Chaining failed actions
+#### `and_then :: S a -> (a -> S b)`
+
+Replaces `Success a` with `Success b`. If a `Failure` is passed as argument, it is ignored.
 
 ```ruby
-Failure(1).and Success(2)            # => Failure(1)
+Success(1).and_then { Success(2) }   # => Success(2)
 Failure(1).and_then { Success(2) }   # => Failure(1)
+```
 
+#### `or`
+
+```ruby
+Success(1).or Success(2)             # => Success(1)
 Failure(1).or Success(1)             # => Success(1)
+```
+
+#### `or_else`
+```ruby
+Success(1).or_else { Success(2) }    # => Success(1)
 Failure(1).or_else { |v| Success(v)} # => Success(1)
 ```
 
-The value or block result must always be a `Success` or `Failure`
+The value or block result must always be a `Success` or `Failure`.
 
-### Either.chain
+### Result.chain
 You can easily chain the execution of several operations. Here we got some nice function composition.  
 The method must be a unary function, i.e. it always takes one parameter - the context, which is passed from call to call.
 
@@ -117,7 +144,7 @@ Success(1) >= method(:error) # Failure(RuntimeError(error 1))
 Now that you have some result, you want to control flow by providing patterns.
 `#match` can match by
 
- * success, failure, either or any
+ * success, failure, result or any
  * values
  * lambdas
  * classes
@@ -126,7 +153,7 @@ Now that you have some result, you want to control flow by providing patterns.
 Success(1).match do
   success { |v| "success #{v}"}
   failure { |v| "failure #{v}"}
-  either  { |v| "either #{v}"}
+  result  { |v| "result #{v}"}
 end # => "success 1"
 ```
 Note1: the inner value has been unwrapped! 
@@ -176,7 +203,18 @@ end # => "catch-all"
 ```
 
 ## core_ext
-You can use a core extension, to include Either in your own class or in Object, i.e. in all classes.
+You can use a core extension, to include Result in your own class or in Object, i.e. in all classes.
+
+## Result
+
+```ruby
+require 'deterministic/core_ext/object/result'
+
+[1].success?        # => false
+Success(1).failure? # => false
+Success(1).success? # => true
+Failure(1).result?  # => true
+```
 
 
 ## Maybe
