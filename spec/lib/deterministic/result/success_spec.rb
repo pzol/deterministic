@@ -19,12 +19,15 @@ describe Deterministic::Success do
   specify { expect(subject).to be_an_instance_of described_class }
   specify { expect(subject).to eq(described_class.new(1)) }
   specify { expect(subject.fmap { |v| v + 1} ).to eq Success(2) }
+  specify { expect(subject.pipe{ |v| raise RuntimeError unless v == 1 } ).to eq Success(1) }
 
   specify { expect(subject.or(Success(2))).to eq Success(1)}
   specify { expect(subject.or_else { Success(2) }).to eq Success(1)}
 
   specify { expect(subject.and(Success(2))).to eq Success(2)}
+  specify { expect(subject.and(Failure(2))).to eq Failure(2)}
   specify { expect(subject.and_then { Success(2) }).to eq Success(2)}
+  specify { expect(subject.and_then { Failure(2) }).to eq Failure(2)}
 
   it_behaves_like 'Result' do
     let(:result) { described_class }
