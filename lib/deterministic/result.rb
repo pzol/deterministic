@@ -46,15 +46,6 @@ module Deterministic
     class << self
       protected :new
     end
-
-    def to_s
-      value.to_s
-    end
-
-    def inspect
-      name = self.class.name.split("::")[-1]
-      "#{name}(#{value})"
-    end
   end
 
 module_function

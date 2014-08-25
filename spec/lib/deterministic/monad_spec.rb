@@ -12,8 +12,10 @@ describe Deterministic::Monad do
     # let(:monad) { monad }
   end
 
-  specify { expect(Identity.new(1).to_s).to  eq 'Identity(1)' }
-  specify { expect(Identity.new(nil).to_s).to  eq 'Identity(nil)' }
+  specify { expect(Identity.new(1).inspect).to  eq 'Identity(1)' }
+  specify { expect(Identity.new(1).to_s).to  eq '1' }
+  specify { expect(Identity.new(nil).inspect).to  eq 'Identity(nil)' }
+  specify { expect(Identity.new(nil).to_s).to  eq '' }
   specify { expect(Identity.new([1, 2]).fmap(&:to_s)).to eq Identity.new("[1, 2]") }
   specify { expect(Identity.new(1).fmap {|v| v + 2}).to eq Identity.new(3) }
   specify { expect(Identity.new('foo').fmap(&:upcase)).to eq Identity.new('FOO')}

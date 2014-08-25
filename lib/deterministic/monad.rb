@@ -38,6 +38,15 @@ module Deterministic
       @value
     end
 
+    def to_s
+      value.to_s
+    end
+
+    def inspect
+      name = self.class.name.split("::")[-1]
+      "#{name}(#{value})"
+    end
+
     # Two monads are equivalent if they are of the same type and when their values are equal
     def ==(other)
       return false unless other.is_a? self.class
@@ -45,7 +54,7 @@ module Deterministic
     end
 
     # Return the string representation of the Monad
-    def to_s
+    def inspect
       pretty_class_name = self.class.name.split('::')[-1]
       "#{pretty_class_name}(#{self.value.inspect})"
     end

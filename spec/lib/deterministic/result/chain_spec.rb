@@ -95,7 +95,7 @@ describe Deterministic::Result do
         Success(self)
       end
 
-      def to_s
+      def inspect
         "Step #{@step}"
       end
 
@@ -144,7 +144,7 @@ describe Deterministic::Result do
       end
 
       actual = Success(1) >= method(:error)
-      expect(actual.inspect).to eq "Failure(error 1)"
+      expect(actual.inspect).to eq "Failure(#<RuntimeError: error 1>)"
     end
   end
 end
