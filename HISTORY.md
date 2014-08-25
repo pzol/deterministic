@@ -1,6 +1,7 @@
 ## v0.10.0
 ** breaking changes **
 
+- Remove `Either#<<`
 - Rename `Either` to `Result`
 
 ## v0.9.0

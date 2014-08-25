@@ -13,12 +13,10 @@ This is a spiritual successor of the [Monadic gem](http://github.com/pzol/monadi
 
 ```ruby
 Success(1).to_s             # => "1"
-Success(1) << Success(2)    # => Success(2)
 Success(Success(1))         # => Success(1)
 Success(1).fmap { |v| v + 1} # => Success(2)
 
 Failure(1).to_s             # => "1"
-Failure(1) << Failure(2)    # => Failure(1)
 Failure(Failure(1))         # => Failure(1)
 Failure(1).fmap { |v| v + 1} # => Failure(2)
 ```

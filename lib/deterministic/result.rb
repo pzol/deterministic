@@ -19,10 +19,6 @@ module Deterministic
       is_a? Failure
     end
 
-    def <<(other)
-      return self if failure?
-      return other if other.is_a? Result 
-    end
 
     # This is an abstract class, can't ever instantiate it directly
     class << self
