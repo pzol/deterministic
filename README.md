@@ -98,26 +98,36 @@ The method must be a unary function, i.e. it always takes one parameter - the co
 The following aliases are defined
 
 ```ruby
+alias :>> :map
+alias :>= :try
+alias :** :pipe       # the operator must be right associative
+```
+
+This allows the composition of procs or lambdas and thus allow a clear definiton of a pipeline.
+
+```ruby
+Success(params) >> validate >> build_request ** log >> send ** log >> build_response
+```
+
+#### Complex Example in a Builder Class
+
+```ruby
 class Foo
   include Deterministic
-  alias :m :method
+  alias :m :method # method conveniently returns a Proc to a method
 
-  def call
-    setup >> m(:validate) >> m(:send)
+  def call(params)
+    Success(params) >> m(:validate) >> m(:send)
   end
 
-  def setup
-    Success(1)
-  end
-
-  def validate(ctx)
+  def validate(params)
     # do stuff
-    Success(ctx + 1)
+    Success(validate_and_cleansed_params)
   end
 
-  def send(ctx)
+  def send(clean_params)
     # do stuff
-    Success(ctx + 1)
+    Success(result)
   end
 end
 
@@ -127,7 +137,7 @@ Foo.new.call # Success(3)
 Chaining works with blocks (`#map` is an alias for `#>>`)
 
 ```ruby
-Success(1).chain {|ctx| Success(ctx + 1)}
+Success(1).map {|ctx| Success(ctx + 1)}
 ```
 
 it also works with lambdas
@@ -157,7 +167,7 @@ Success(0) >> method(:works) >> method(:breaks) >> method(:never_executed) # Fai
 
 ```ruby
 def error(ctx)
-  raise "error #{1}"
+  raise "error #{ctx}"
 end
 
 Success(1) >= method(:error) # Failure(RuntimeError(error 1))
