@@ -5,12 +5,6 @@ module Deterministic
     include Deterministic::PatternMatching
     include Chain
 
-    def bind(proc=nil, &block)
-      (proc || block).call(value).tap do |result|
-        raise NotMonadError, "Expected #{result.inspect} to be an Result" unless result.is_a? self.class.superclass
-      end
-    end
-
     def success?
       is_a? Success
     end

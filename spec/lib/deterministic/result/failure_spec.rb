@@ -15,6 +15,8 @@ describe Deterministic::Failure do
   specify { expect(subject).to be_an_instance_of described_class }
   specify { expect(subject).to be_failure }
   specify { expect(subject).not_to be_success }
+  specify { expect(subject.success?).to be_falsey }
+  specify { expect(subject.failure?).to be_truthy }
 
   specify { expect(subject).to be_an_instance_of described_class }
   specify { expect(subject).to eq(described_class.new(1)) }

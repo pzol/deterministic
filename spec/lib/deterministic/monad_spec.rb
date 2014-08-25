@@ -7,8 +7,9 @@ describe Deterministic::Monad do
     include Deterministic::Monad
   end
 
+  let(:monad) { Identity }
   it_behaves_like 'a Monad' do 
-    let(:monad) { Identity }
+    # let(:monad) { monad }
   end
 
   specify { expect(Identity.new(1).to_s).to  eq 'Identity(1)' }
@@ -25,24 +26,17 @@ describe Deterministic::Monad do
 
     it "passes the monad class, this is ruby-fu?!" do
      Identity.new(1)
-      .bind do |_, monad|
+      .bind do |_|
         expect(monad).to eq Identity
         monad.new(_)
       end
     end
 
     specify { expect(
-      Identity.new(1).bind { |value, monad| monad.new(value + 1) }
+      monad.new(1).bind { |value| monad.new(value + 1) }
       ).to eq Identity.new(2)
     }
 
   end
   specify { expect(Identity.new(Identity.new(1))).to eq Identity.new(1) }
-
-  # it 'delegates #flat_map to an underlying collection and wraps the resulting collection' do
-  #   Identity.unit([1,2]).flat_map {|v| v + 1}.should == Identity.unit([2, 3])
-  #   Identity.unit(['foo', 'bar']).flat_map(&:upcase).should == Identity.unit(['FOO', 'BAR'])
-  #   expect { Identity.unit(1).flat_map {|v| v + 1 } }.to raise_error(RuntimeError)
-  # end
-
 end
