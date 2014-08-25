@@ -2,7 +2,7 @@ require 'spec_helper'
 
 include Deterministic
 
-describe Deterministic::Either::Match do
+describe Deterministic::Result::Match do
   it "can match Success" do
     expect(
       Success(1).match do
@@ -55,14 +55,14 @@ describe Deterministic::Either::Match do
     ).to eq "catch-all"
   end
 
-  it "can match either" do
+  it "can match result" do
     expect(
       Failure(2).match do
         success    { |v| "not matched s"  }
-        either(2)  { |v| "either #{v}"    }
+        result(2)  { |v| "result #{v}"    }
         failure(3) { |v| "not matched f3" }
       end
-    ).to eq "either 2"
+    ).to eq "result 2"
   end
 
   it "can match with lambdas" do
@@ -93,7 +93,7 @@ describe Deterministic::Either::Match do
     ).to eq "it works"
   end
 
-  it "allows for Either values to play with pattern matching comparisons" do
+  it "allows for Result values to play with pattern matching comparisons" do
     class MyErrorHash < Hash
       def ==(error_type_symbol)
         self[:type] == error_type_symbol

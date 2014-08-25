@@ -2,8 +2,11 @@ require 'spec_helper'
 
 include Deterministic
 
-describe Deterministic::Either do
-  context ">> (chain)" do
+describe Deterministic::Result do
+  context ">> (map)" do
+    specify { expect(Success(0).map { |n| Success(n + 1) }).to eq Success(1) }
+    specify { expect(Failure(0).map { |n| Success(n + 1) }).to eq Failure(0) }
+
     it "Failure stops execution" do
       class ChainUnderTest
         alias :m :method
@@ -40,17 +43,17 @@ describe Deterministic::Either do
       expect(test.call).to eq Failure("Error @ 3")
     end
 
-    it "expects an Either" do
-      def returns_non_either(i)
+    it "expects an Result" do
+      def returns_non_result(i)
         2
       end
 
-      expect { Success(1) >> method(:returns_non_either) }.to raise_error(Deterministic::Monad::NotMonadError)
+      expect { Success(1) >> method(:returns_non_result) }.to raise_error(Deterministic::Monad::NotMonadError)
     end
 
     it "works with a block" do
       expect(
-        Success(1).chain { |i| Success(i + 1) }
+        Success(1).map { |i| Success(i + 1) }
       ).to eq Success(2)
     end
 
@@ -72,9 +75,9 @@ describe Deterministic::Either do
       def call
         @step = 0
         Success(self).
-          chain(&:validate).
-          chain(&:build).
-          chain(&:send)
+          map(&:validate).
+          map(&:build).
+          map(&:send)
       end
 
       def validate
@@ -95,6 +98,18 @@ describe Deterministic::Either do
       def to_s
         "Step #{@step}"
       end
+
+      # # def self.procify(*meths)
+      # #   meths.each do |m|
+      # #     new_m = "__#{m}__procified".to_sym
+      # #     alias new_m m
+      # #     define_method new_m do |ctx|
+      # #       method(m)
+      # #     end
+      # #   end
+      # # end
+
+      # procify :send
     end
 
     it "works" do

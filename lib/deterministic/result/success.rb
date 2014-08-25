@@ -1,22 +1,22 @@
 module Deterministic
-  class Failure < Either
+  class Success < Result
     class << self; public :new; end
 
     def and(other)
-      self
-    end
-
-    def and_then(&block)
-      self
-    end
-
-    def or(other)
-      raise NotMonadError, "Expected #{other.inspect} to be an Either" unless other.is_a? Either
+      raise NotMonadError, "Expected #{other.inspect} to be an Result" unless other.is_a? Result
       other
     end
 
-    def or_else(&block)
+    def and_then(&block)
       bind(&block)
+    end
+
+    def or(other)
+      self
+    end
+
+    def or_else(&block)
+      self
     end
   end
 end

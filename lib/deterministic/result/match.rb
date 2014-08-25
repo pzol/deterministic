@@ -4,7 +4,7 @@ module Deterministic::PatternMatching
     context ||= block.binding.eval('self')
     match = Match.new(self, context)
     match.instance_eval &block
-    match.result
+    match.call
   end
 
   class NoMatchError < StandardError; end
@@ -16,14 +16,14 @@ module Deterministic::PatternMatching
       @collection = []
     end
 
-    def result
+    def call
       matcher = @collection.detect { |m| m.matches?(@container.value) }
       raise NoMatchError, "No match could be made for #{@container.inspect}" if matcher.nil?
       @context.instance_exec(@container.value, &matcher.block)
     end
 
-    # TODO: Either specific DSL, will need to move it to Either, later on
-    %w[Success Failure Either].each do |s|
+    # TODO: Result specific DSL, will need to move it to Result, later on
+    %w[Success Failure Result].each do |s|
       define_method s.downcase.to_sym do |value=nil, &block|
         klas = Module.const_get(s)
         push(klas, value, block)

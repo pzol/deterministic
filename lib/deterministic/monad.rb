@@ -22,11 +22,11 @@ module Deterministic
     end
 
     # The monad: takes a function which returns a monad (of the same type), applies the function
-    # bind :: M a  -> (a -> Mb) -> M b
+    # bind :: (a -> Mb) -> M a  -> M b
     # the self.class, i.e. the containing monad is passed as a second (optional) arg to the function
     def bind(proc=nil, &block)
       (proc || block).call(value, self.class).tap do |result|
-        raise NotMonadError, "Expected #{result.inspect} to be an Either" unless result.is_a? self.class
+        raise NotMonadError, "Expected #{result.inspect} to be an Result" unless result.is_a? self.class
       end
     end
     alias :'>>=' :bind

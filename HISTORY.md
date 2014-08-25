@@ -1,3 +1,8 @@
+## v0.10.0
+** breaking changes **
+
+- Rename `Either` to `Result`
+
 ## v0.9.0
 ** breaking changes **
 

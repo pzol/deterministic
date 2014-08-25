@@ -1,21 +1,21 @@
 module Deterministic
-  class Either
+  class Result
     module Chain
-      def chain(proc=nil, &block)
+      def map(proc=nil, &block)
         return self if failure?
-        bind { (proc || block).call(@value) }
+        bind(proc || block)
       end
 
-      alias :>> :chain
+      alias :>> :map
 
       def try(proc=nil, &block)
-        return self if failure?
-        bind { (proc || block).call(@value) }
+        map(proc, &block)
       rescue => err
         Failure(err)
       end
 
       alias :>= :try
+
     end
   end
 end

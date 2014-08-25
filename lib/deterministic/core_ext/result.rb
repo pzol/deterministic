@@ -2,7 +2,7 @@ include Deterministic
 
 module Deterministic
   module CoreExt
-    module Either
+    module Result
       def success?
         self.is_a? Success
       end
@@ -11,7 +11,7 @@ module Deterministic
         self.is_a? Failure
       end
 
-      def either?
+      def result?
         success? || failure?
       end
     end

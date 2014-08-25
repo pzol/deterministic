@@ -1,6 +1,6 @@
 require 'spec_helper'
 require_relative '../monad_axioms'
-require_relative 'either_shared'
+require_relative 'result_shared'
 
 include Deterministic
 
@@ -28,8 +28,8 @@ describe Deterministic::Failure do
   specify { expect(subject.and(Success(2))).to eq Failure(1)}
   specify { expect(subject.and_then { Success(2) }).to eq Failure(1)}
 
-  it_behaves_like 'Either' do
-    let(:either) { described_class }
+  it_behaves_like 'Result' do
+    let(:result) { described_class }
   end
 end
 
