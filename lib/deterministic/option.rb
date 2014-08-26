@@ -23,7 +23,7 @@ module Deterministic
     class << self
       protected :new
 
-      def nil?(expr)
+      def some?(expr)
         to_option(expr) { expr.nil? }
       end
 

@@ -5,9 +5,9 @@ include Deterministic
 
 describe Deterministic::Option do
   # nil?
-  specify { expect(described_class.nil?(nil)).to eq None }
-  specify { expect(described_class.nil?(1)).to be_some }
-  specify { expect(described_class.nil?(1)).to eq Some(1) }
+  specify { expect(described_class.some?(nil)).to eq None }
+  specify { expect(described_class.some?(1)).to be_some }
+  specify { expect(described_class.some?(1)).to eq Some(1) }
 
   # any?
   specify { expect(described_class.any?(nil)).to be_none }
