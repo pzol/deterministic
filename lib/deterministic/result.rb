@@ -10,7 +10,7 @@ module Deterministic
 
         %w[Success Failure Result].each do |s|
           define_method s.downcase.to_sym do |value=nil, &block|
-            klas = Module.const_get("Deterministic::Result::#{s}")
+            klas = Deterministic::Result.const_get(s)
             push(klas, value, block)
           end
         end
@@ -61,17 +61,17 @@ module Deterministic
     class << self
       protected :new
     end
-    
+
     class Failure < Result
       class << self; public :new; end
     end
-    
+
     class Success < Result
       class << self; public :new; end
     end
   end
 
-module_function
+  module_function
   def Success(value)
     Result::Success.new(value)
   end
