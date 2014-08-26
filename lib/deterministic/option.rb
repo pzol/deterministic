@@ -34,6 +34,10 @@ module Deterministic
       def to_option(expr, &predicate)
         predicate.call(expr) ? None.new : Some.new(expr)
       end
+
+      def try!
+        yield rescue None.new
+      end
     end
 
     def map(proc=nil, &block)

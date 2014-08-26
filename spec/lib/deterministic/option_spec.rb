@@ -16,6 +16,9 @@ describe Deterministic::Option do
   specify { expect(described_class.any?({})).to  be_none }
   specify { expect(described_class.any?([1])).to eq Some([1]) }
   specify { expect(described_class.any?({foo: 1})).to eq Some({foo: 1}) }
+
+  # try!
+  specify { expect(described_class.try! { raise "error" }).to be_none }
 end
 
 describe Deterministic::Option::Some do
@@ -30,6 +33,8 @@ describe Deterministic::Option::Some do
   specify { expect(described_class.new(0).value).to eq 0 }
 
   specify { expect(described_class.new(1).fmap { |n| n + 1}).to eq Some(2) }
+  specify { expect(described_class.new(1).map { |n| Some(n + 1)}).to eq Some(2) }
+  specify { expect(described_class.new(1).map { |n| None }).to eq None }
 
   specify {
     expect(
@@ -57,6 +62,15 @@ describe Deterministic::Option::Some do
         some(Fixnum) { 1 }
       }
     ).to eq 1
+  }
+
+  specify {
+    expect(
+      None.match {
+        none { 0 }
+        some { 1 }
+      }
+    ).to eq 0
   }
 
 end
