@@ -65,15 +65,13 @@ module Deterministic
         "None"
       end
 
-      # def value
-      #   self
-      # end
-      def none(*args)
+      undef :value
+
+      def fmap(*args)
         self
       end
 
-      alias :fmap :none
-      alias :map :none
+      alias :map :fmap
 
       def ==(other)
         other.class == self.class

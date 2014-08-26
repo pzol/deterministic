@@ -18,9 +18,10 @@ module Deterministic
       end
 
       def call
-        matcher = @collection.detect { |m| m.matches?(@container.value) }
+        value = @container.respond_to?(:value) ? @container.value : nil
+        matcher = @collection.detect { |m| m.matches?(value)  }
         raise NoMatchError, "No match could be made for #{@container.inspect}" if matcher.nil?
-        @context.instance_exec(@container.value, &matcher.block)
+        @context.instance_exec(value, &matcher.block)
       end
 
       # catch-all

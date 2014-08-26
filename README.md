@@ -273,7 +273,9 @@ Failure(1).result?  # => true
 Some(1).fmap { |n| n + 1 }             # => Some(2)
 Some(1).map  { |n| Some(n + 1) }       # => Some(2)
 Some(1).map  { |n| None }              # => None
+Some(1).value                          # => 1
 None.map     { |n| Some(n + 1) }       # => None
+None.value                             # => NoMethodError
 ```
 
 ### Coercion
@@ -287,6 +289,9 @@ Option.some?(nil)                      # => None
 Option.some?([])                       # => Some([])
 Option.some?({})                       # => Some({})
 Option.some?(1)                        # => Some(1)
+
+Option.try! { 1 }                      # => Some(1)
+Option.try! { raise "error"}           # => None
 ```
 
 ### Pattern Matching 
