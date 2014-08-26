@@ -1,3 +1,12 @@
+## v0.12.1
+
+- Fix backwards compatibility with Ruby < 2.0.0
+
+## v0.12.0
+
+- Add Option
+- Nest `Success` and `Failure` under `Result`
+
 ## v0.10.0
 ** breaking changes **
 
