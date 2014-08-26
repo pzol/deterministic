@@ -1,5 +1,5 @@
 module Deterministic
-  # Abstract parent of Some and None 
+  # Abstract parent of Some and None
   class Option
     include Monad
 
@@ -10,7 +10,7 @@ module Deterministic
 
         %w[Some None Option].each do |s|
           define_method s.downcase.to_sym do |value=nil, &block|
-            klas = Module.const_get("Deterministic::Option::#{s}")
+            klas = Deterministic::Option.const_get(s)
             push(klas, value, block)
           end
         end
@@ -85,7 +85,7 @@ module Deterministic
     end
   end
 
-module_function
+  module_function
   def Some(value)
     Option::Some.new(value)
   end
