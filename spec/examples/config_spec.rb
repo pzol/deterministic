@@ -10,7 +10,7 @@ class ElasticSearchConfig
   attr_reader :env
 
   def hosts
-    Option.any?(env_hosts).match {
+    Option.any?(proc_env["RESFINITY_LOG_CLIENT_ES_HOST"]).match {
       some { |s| { hosts: s.split(/, */) } }
       none { default_hosts }
     }
@@ -18,10 +18,6 @@ class ElasticSearchConfig
 
 private
   attr_reader :proc_env
-  def env_hosts
-    proc_env["RESFINITY_LOG_CLIENT_ES_HOST"]
-  end
-
   def default_hosts
     case env
     when "production"
