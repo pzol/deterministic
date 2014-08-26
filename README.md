@@ -256,7 +256,7 @@ end # => "catch-all"
 ## core_ext
 You can use a core extension, to include Result in your own class or in Object, i.e. in all classes.
 
-## Result
+
 
 ```ruby
 require 'deterministic/core_ext/object/result'
@@ -265,6 +265,37 @@ require 'deterministic/core_ext/object/result'
 Success(1).failure? # => false
 Success(1).success? # => true
 Failure(1).result?  # => true
+```
+
+## Option
+
+```ruby
+Some(1).fmap { |n| n + 1 }             # => Some(2)
+Some(1).map  { |n| Some(n + 1) }       # => Some(2)
+Some(1).map  { |n| None }              # => None
+None.map     { |n| Some(n + 1) }       # => None
+```
+
+### Coercion
+```ruby
+Option.any?(nil)                       # => None
+Option.any?([])                        # => None
+Option.any?({})                        # => None
+Option.any?(1)                         # => Some(1)
+
+Option.some?(nil)                      # => None
+Option.some?([])                       # => Some([])
+Option.some?({})                       # => Some({})
+Option.some?(1)                        # => Some(1)
+```
+
+### Pattern Matching 
+```ruby
+Some(1).match {
+  some(1) { |n| n + 1 }
+  some    { 1 }
+  none    { 0 }
+}                                      # => 2
 ```
 
 
