@@ -114,7 +114,7 @@ describe Deterministic::Result do
 
     it "works" do
       test = SelfContextUnderTest.new.call
-      expect(test).to be_a Success
+      expect(test).to be_a described_class::Success
       expect(test.inspect).to eq "Success(Step 3)"
     end
   end

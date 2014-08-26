@@ -19,13 +19,13 @@ describe ValidateAddress do
   subject { ValidateAddress.call(candidate)  }
   context 'sunny day' do
     let(:candidate) { {title: "Hobbiton", street: "501 Buckland Rd", city: "Matamata", postal: "3472", country: "nz"} }
-    specify { expect(subject).to be_a Success }
+    specify { expect(subject).to be_a Result::Success }
     specify { expect(subject.value).to eq candidate }
   end
 
   context 'empty data' do
     let(:candidate) { {} }
-    specify { expect(subject).to be_a Failure }
+    specify { expect(subject).to be_a Result::Failure }
     specify { expect(subject.value).to include(:street, :city, :postal) }
   end
 end

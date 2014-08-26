@@ -4,7 +4,7 @@ require_relative 'result_shared'
 
 include Deterministic
 
-describe Deterministic::Failure do
+describe Deterministic::Result::Failure do
 
   it_behaves_like 'a Monad' do
     let(:monad) { described_class }

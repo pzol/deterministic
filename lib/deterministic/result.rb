@@ -61,22 +61,22 @@ module Deterministic
     class << self
       protected :new
     end
-  end
-
-  class Failure < Result
-    class << self; public :new; end
-  end
-  
-  class Success < Result
-    class << self; public :new; end
+    
+    class Failure < Result
+      class << self; public :new; end
+    end
+    
+    class Success < Result
+      class << self; public :new; end
+    end
   end
 
 module_function
   def Success(value)
-    Success.new(value)
+    Result::Success.new(value)
   end
 
   def Failure(value)
-    Failure.new(value)
+    Result::Failure.new(value)
   end
 end
