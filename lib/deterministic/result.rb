@@ -2,7 +2,22 @@ module Deterministic
   # Abstract parent of Success and Failure
   class Result
     include Monad
-    include Deterministic::PatternMatching
+
+    module PatternMatching
+      include Deterministic::PatternMatching
+      class Match
+        include Deterministic::PatternMatching::Match
+
+        %w[Success Failure Result].each do |s|
+          define_method s.downcase.to_sym do |value=nil, &block|
+            klas = Module.const_get("Deterministic::Result::#{s}")
+            push(klas, value, block)
+          end
+        end
+      end
+    end
+
+    include PatternMatching
     include Chain
 
     def success?
@@ -46,6 +61,14 @@ module Deterministic
     class << self
       protected :new
     end
+  end
+
+  class Failure < Result
+    class << self; public :new; end
+  end
+  
+  class Success < Result
+    class << self; public :new; end
   end
 
 module_function

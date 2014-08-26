@@ -1,5 +1,5 @@
 module Deterministic
-  module GlobalPatternMatching
+  module PatternMatching
 
     def match(context=nil, &block)
       context ||= block.binding.eval('self') # the instance containing the match block

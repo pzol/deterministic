@@ -1,11 +1,12 @@
 module Deterministic
+  # Abstract parent of Some and None 
   class Option
     include Monad
 
     module PatternMatching
-      include Deterministic::GlobalPatternMatching
+      include Deterministic::PatternMatching
       class Match
-        include GlobalPatternMatching::Match
+        include Deterministic::PatternMatching::Match
 
         %w[Some None Option].each do |s|
           define_method s.downcase.to_sym do |value=nil, &block|
