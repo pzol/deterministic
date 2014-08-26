@@ -2,14 +2,41 @@ module Deterministic
   class Option
     include Monad
 
+    module PatternMatching
+      include Deterministic::GlobalPatternMatching
+      class Match
+        include GlobalPatternMatching::Match
+
+        %w[Some None Option].each do |s|
+          define_method s.downcase.to_sym do |value=nil, &block|
+            klas = Module.const_get("Deterministic::Option::#{s}")
+            push(klas, value, block)
+          end
+        end
+      end
+    end
+
+    include PatternMatching
+
     # This is an abstract class, can't ever instantiate it directly
     class << self
       protected :new
+
+      def nil?(expr)
+        to_option(expr) { expr.nil? }
+      end
+
+      def any?(expr)
+        to_option(expr) { expr.nil? || not(expr.respond_to?(:empty?)) || expr.empty? }
+      end
+
+      def to_option(expr, &predicate)
+        predicate.call(expr) ? None.new : Some.new(expr)
+      end
     end
 
     def map(proc=nil, &block)
       return self if none?
-      p [:map, self.inspect]
       bind(proc || block)
     end
 
@@ -18,34 +45,46 @@ module Deterministic
     end
 
     def none?
-      false
+      is_a? None
     end
 
     class Some < Option
-      # include Enumerable
+      class << self; public :new; end
+    end
 
-      class << self
-        public :new
+    class None < Option
+      class << self; public :new; end
+      def initialize(*args); end
 
-        def [](*values)
-          Some.new(values)
-        end
+      def inspect
+        "None"
       end
 
-      def iter
-        return value.to_enum(:each) if value.is_a? Enumerable
-        return Array[value].to_enum(:each)
+      # def value
+      #   self
+      # end
+      def none(*args)
+        self
       end
+
+      alias :fmap :none
+      alias :map :none
+
+      def ==(other)
+        other.class == self.class
+      end
+
+      # def value
+      #   self # raise "value called on a None"
+      # end
     end
   end
-
 
 module_function
   def Some(value)
     Option::Some.new(value)
   end
-  # def None(value)
-  #   None.new(value)
-  # end
-# end
+
+  None = Deterministic::Option::None.new
 end
+# p Deterministic::Option::Some::Match.new(.methods
