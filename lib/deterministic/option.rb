@@ -10,7 +10,7 @@ module Deterministic
 
         %w[Some None Option].each do |s|
           define_method s.downcase.to_sym do |value=nil, &block|
-            klas = Module.const_get("Deterministic::Option::#{s}")
+            klas = self.class.module_eval(s)
             push(klas, value, block)
           end
         end
