@@ -31,6 +31,7 @@ describe Deterministic::Option::Some do
   specify { expect(described_class.new(0).some?).to be_truthy }
   specify { expect(described_class.new(0).none?).to be_falsey }
   specify { expect(described_class.new(0).value).to eq 0 }
+  specify { expect(described_class.new(1).value_or(2)).to eq 1}
 
   specify { expect(described_class.new(1).fmap { |n| n + 1}).to eq Some(2) }
   specify { expect(described_class.new(1).map { |n| Some(n + 1)}).to eq Some(2) }
@@ -84,6 +85,7 @@ describe Deterministic::Option::None do
   specify { expect(described_class.new.some?).to be_falsey }
   specify { expect(described_class.new.none?).to be_truthy }
   specify { expect { described_class.new.value }.to raise_error NoMethodError }
+  specify { expect(described_class.new.value_or(2)).to eq 2}
 
   specify { expect(described_class.new.fmap { |n| n + 1}).to eq None }
   specify { expect(described_class.new.map { |n| nil }).to eq None }

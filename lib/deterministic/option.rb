@@ -53,6 +53,11 @@ module Deterministic
       is_a? None
     end
 
+    def value_or(default)
+      return default if none?
+      return value
+    end
+
     class Some < Option
       class << self; public :new; end
     end
