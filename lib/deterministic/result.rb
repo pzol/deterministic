@@ -1,11 +1,5 @@
 module Deterministic
   # Abstract parent of Success and Failure
-  #
-  # `fmap(self: Result(a), op: |a| -> b) -> Result(b)`
-  # Maps a `Result` with the value `a` to the same `Result` with the value `b`.
-  #
-  # `bind(self: Result(a), op: |a| -> Result(b)) -> Result(b)`
-  # Maps a `Result` with the value `a` to another `Result` with the value `b`.
   class Result
     include Monad
 
@@ -49,7 +43,7 @@ module Deterministic
     alias :** :pipe
 
     # `pipe(self: Result(a), op: |Result(a)| -> b) -> Result(a)`
-    # Executes the block passed, but completely ignores its result. If an error is raised within the block it will **NOT** be catched.
+    # Replaces `Success a` with `Result b`. If a `Failure` is passed as argument, it is ignored.
     def and(other)
       return self if failure?
       raise NotMonadError, "Expected #{other.inspect} to be an Result" unless other.is_a? Result

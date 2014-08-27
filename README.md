@@ -42,20 +42,27 @@ Failure(1).to_s                        # => "1"
 Failure(Failure(1))                    # => Failure(1)
 ```
 
+Maps a `Result` with the value `a` to the same `Result` with the value `b`.
+
 ```ruby
 Success(1).fmap { |v| v + 1}           # => Success(2)
 Failure(1).fmap { |v| v - 1}           # => Failure(0)
 ```
+
+Maps a `Result` with the value `a` to another `Result` with the value `b`.
 
 ```ruby
 Success(1).bind { |v| Failure(v + 1) } # => Failure(2)
 Failure(1).bind { |v| Success(v - 1) } # => Success(0)
 ```
 
+Maps a `Success` with the value `a` to another `Result` with the value `b`. It works like `#bind` but only on `Success`.
+
 ```ruby
 Success(1).map { |n| n + 1 }           # => Success(2)
 Failure(0).map { |n| n + 1 }           # => Failure(0)
 ```
+Maps a `Failure` with the value `a` to another `Result` with the value `b`. It works like `#bind` but only on `Failure`.
 
 ```ruby
 Failure(1).map_err { |n| n + 1 }       # => Success(2)
@@ -66,25 +73,35 @@ Success(0).map_err { |n| n + 1 }       # => Success(0)
 Success(0).try { |n| raise "Error" }   # => Failure(Error)
 ```
 
+Replaces `Success a` with `Result b`. If a `Failure` is passed as argument, it is ignored.
+
 ```ruby
 Success(1).and Success(2)              # => Success(2)
 Failure(1).and Success(2)              # => Failure(1)
 ```
+
+Replaces `Success a` with the result of the block. If a `Failure` is passed as argument, it is ignored.
 
 ```ruby
 Success(1).and_then { Success(2) }     # => Success(2)
 Failure(1).and_then { Success(2) }     # => Failure(1)
 ```
 
+Replaces `Failure a` with `Result`. If a `Failure` is passed as argument, it is ignored.
+
 ```ruby
 Success(1).or Success(2)               # => Success(1)
 Failure(1).or Success(1)               # => Success(1)
 ```
 
+Replaces `Failure a` with the result of the block. If a `Success` is passed as argument, it is ignored.
+
 ```ruby
 Success(1).or_else { Success(2) }      # => Success(1)
 Failure(1).or_else { |n| Success(n)}   # => Success(1)
 ```
+
+Executes the block passed, but completely ignores its result. If an error is raised within the block it will **NOT** be catched.
 
 ```ruby
 Success(1).try { |n| log(n.value) }    # => Success(1)
