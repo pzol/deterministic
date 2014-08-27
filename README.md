@@ -6,6 +6,29 @@ Deterministic is to help your code to be more confident, it's specialty is flow 
 
 This is a spiritual successor of the [Monadic gem](http://github.com/pzol/monadic). The goal of the rewrite is to get away from a bit to forceful aproach I took in Monadic, especially when it comes to coercing monads, but also a more practical but at the same time more strict adherence to monad laws.
 
+## Patterns
+
+Deterministic provides different monads, here is a short guide, when to use which
+
+#### Result: Success & Failure
+- an operation which can succeed or fail
+- the result (content) of of the success or failure is important
+- you are building one thing
+- chaining: if one fails (Failure), don't execute the rest
+
+#### Option: Some & None
+- an operation which returns either some result or nothing
+- in case it returns nothing it is not important to know why
+- you are working rather with a collection of things
+- chaining: execute all and then select the successful ones (Some)
+
+#### Either: Left & Right
+- an operation which returns several good and bad results
+- the results of both are important
+- chaining: if one fails, continue, the content of the failed and successful are important
+
+#### Maybe
+- an object may be nil, you want to avoid endless nil? checks
 
 ## Usage
 
@@ -293,6 +316,9 @@ None.value_to_a                        # => None
 
 Some(1) + Some(1)                      # => Some(2)
 Some([1]) + Some(1)                    # => TypeError: No implicit conversion
+None + Some(1)                         # => Some(1)
+Some(1) + None                         # => Some(1)
+Some([1]) + None + Some([2])           # => Some([1, 2])
 ```
 
 ### Coercion
