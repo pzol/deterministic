@@ -2,6 +2,7 @@ module Deterministic
   module Monad
     class NotMonadError < StandardError; end
 
+    # Basicly the `pure` function
     def initialize(value)
       @value = join(value)
     end
