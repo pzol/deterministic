@@ -49,6 +49,18 @@ module Deterministic
     def value_to_a
       map { self.class.new(Array(value)) }
     end
+
+    ## Add the inner values of two Some
+    def +(other)
+      return other if none?
+      fmap { |v| 
+        other.match {
+          some { v + other.value }
+          none { self }
+        }
+      }
+    end
+
     def some?
       is_a? Some
     end

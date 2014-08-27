@@ -59,6 +59,15 @@ describe Deterministic::Option do
   specify { expect(Some([1]).value_to_a). to eq Some([1])}
   specify { expect(None.value_to_a). to eq None}
 
+  # +
+  specify { expect(Some(1) + None).to eq Some(1) }
+  specify { expect(Some(1) + None + None).to eq Some(1) }
+  specify { expect(Some(1) + Some(1)).to eq Some(2) }
+  specify { expect(None + Some(1)).to eq Some(1) }
+  specify { expect(None + None + Some(1)).to eq Some(1) }
+  specify { expect(None + None + Some(1) + None).to eq Some(1) }
+  specify { expect { Some([1]) + Some(1)}.to raise_error TypeError}
+
   # match
   specify {
     expect(

@@ -290,6 +290,9 @@ None.value_or(0)                       # => 0
 Some(1).value_to_a                     # => Some([1])
 Some([1]).value_to_a                   # => Some([1])
 None.value_to_a                        # => None
+
+Some(1) + Some(1)                      # => Some(2)
+Some([1]) + Some(1)                    # => TypeError: No implicit conversion
 ```
 
 ### Coercion
