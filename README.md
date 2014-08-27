@@ -42,88 +42,49 @@ Failure(1).to_s                        # => "1"
 Failure(Failure(1))                    # => Failure(1)
 ```
 
-#### `fmap(self: Result(a), op: |a| -> b) -> Result(b)`
-
-Maps a `Result` with the value `a` to the same `Result` with the value `b`.
-
 ```ruby
 Success(1).fmap { |v| v + 1}           # => Success(2)
 Failure(1).fmap { |v| v - 1}           # => Failure(0)
 ```
-
-#### `bind(self: Result(a), op: |a| -> Result(b)) -> Result(b)`
-
-Maps a `Result` with the value `a` to another `Result` with the value `b`.
 
 ```ruby
 Success(1).bind { |v| Failure(v + 1) } # => Failure(2)
 Failure(1).fmap { |v| Success(v - 1) } # => Success(0)
 ```
 
-#### `map(self: Success(a), op: |a| -> Result(b)) -> Result(b)`
-
-Maps a `Success` with the value `a` to another `Result` with the value `b`. It works like `#bind` but only on `Success`.
-
 ```ruby
 Success(1).map { |n| n + 1 }           # => Success(2)
 Failure(0).map { |n| n + 1 }           # => Failure(0)
 ```
-
-#### `map_err(self: Failure(a), op: |a| -> Result(b)) -> Result(b)`
-
-Maps a `Failure` with the value `a` to another `Result` with the value `b`. It works like `#bind` but only on `Failure`.
 
 ```ruby
 Failure(1).map_err { |n| n + 1 } # => Success(2)
 Success(0).map_err { |n| n + 1 } # => Success(0)
 ```
 
-#### `try(self: Success(a),  op: |a| -> Result(b)) -> Result(b)`
-
-Just like `#map`, transforms `a` to another `Result`, but it will also catch raised exceptions and wrap them with a `Failure`.
-
 ```ruby
 Success(0).try { |n| raise "Error" }   # => Failure(Error)
 ```
-
-#### `and(self: Success(a), other: Result(b)) -> Result(b)`
-
-Replaces `Success a` with `Result b`. If a `Failure` is passed as argument, it is ignored.
 
 ```ruby
 Success(1).and Success(2)            # => Success(2)
 Failure(1).and Success(2)            # => Failure(1)
 ```
 
-#### `and_then(self: Success(a), op: |a| -> Result(b)) -> Result(b)`
-
-Replaces `Success a` with the result of the block. If a `Failure` is passed as argument, it is ignored.
-
 ```ruby
 Success(1).and_then { Success(2) }   # => Success(2)
 Failure(1).and_then { Success(2) }   # => Failure(1)
 ```
-
-#### `or(self: Failure(a), other: Result(b)) -> Result(b)` 
-Replaces `Failure a` with `Result`. If a `Failure` is passed as argument, it is ignored.
 
 ```ruby
 Success(1).or Success(2)             # => Success(1)
 Failure(1).or Success(1)             # => Success(1)
 ```
 
-#### `or_else(self: Failure(a),  op: |a| -> Result(b)) -> Result(b)`
-
-Replaces `Failure a` with the result of the block. If a `Success` is passed as argument, it is ignored.
-
 ```ruby
 Success(1).or_else { Success(2) }    # => Success(1)
 Failure(1).or_else { |n| Success(n)} # => Success(1)
 ```
-
-#### `pipe(self: Result(a), op: |Result(a)| -> b) -> Result(a)`
-
-Executes the block passed, but completely ignores its result. If an error is raised within the block it will **NOT** be catched.
 
 ```ruby
 Success(1).try { |n| log(n.value) }  # => Success(1)
