@@ -18,7 +18,6 @@ module Deterministic
     end
 
     include PatternMatching
-    include Chain
 
     # This is an abstract class, can't ever instantiate it directly
     class << self
