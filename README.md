@@ -49,7 +49,7 @@ Failure(1).fmap { |v| v - 1}           # => Failure(0)
 
 ```ruby
 Success(1).bind { |v| Failure(v + 1) } # => Failure(2)
-Failure(1).fmap { |v| Success(v - 1) } # => Success(0)
+Failure(1).bind { |v| Success(v - 1) } # => Success(0)
 ```
 
 ```ruby
@@ -58,8 +58,8 @@ Failure(0).map { |n| n + 1 }           # => Failure(0)
 ```
 
 ```ruby
-Failure(1).map_err { |n| n + 1 } # => Success(2)
-Success(0).map_err { |n| n + 1 } # => Success(0)
+Failure(1).map_err { |n| n + 1 }       # => Success(2)
+Success(0).map_err { |n| n + 1 }       # => Success(0)
 ```
 
 ```ruby
@@ -67,27 +67,27 @@ Success(0).try { |n| raise "Error" }   # => Failure(Error)
 ```
 
 ```ruby
-Success(1).and Success(2)            # => Success(2)
-Failure(1).and Success(2)            # => Failure(1)
+Success(1).and Success(2)              # => Success(2)
+Failure(1).and Success(2)              # => Failure(1)
 ```
 
 ```ruby
-Success(1).and_then { Success(2) }   # => Success(2)
-Failure(1).and_then { Success(2) }   # => Failure(1)
+Success(1).and_then { Success(2) }     # => Success(2)
+Failure(1).and_then { Success(2) }     # => Failure(1)
 ```
 
 ```ruby
-Success(1).or Success(2)             # => Success(1)
-Failure(1).or Success(1)             # => Success(1)
+Success(1).or Success(2)               # => Success(1)
+Failure(1).or Success(1)               # => Success(1)
 ```
 
 ```ruby
-Success(1).or_else { Success(2) }    # => Success(1)
-Failure(1).or_else { |n| Success(n)} # => Success(1)
+Success(1).or_else { Success(2) }      # => Success(1)
+Failure(1).or_else { |n| Success(n)}   # => Success(1)
 ```
 
 ```ruby
-Success(1).try { |n| log(n.value) }  # => Success(1)
+Success(1).try { |n| log(n.value) }    # => Success(1)
 ```
 
 The value or block result must always be a `Result` i.e. `Success` or `Failure`.
