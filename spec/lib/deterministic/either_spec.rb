@@ -25,4 +25,5 @@ describe Deterministic::Either do
     }
     expect(actual).to eq Either.new([1, 3], [2, 4])
   end
+
 end

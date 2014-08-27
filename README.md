@@ -270,12 +270,20 @@ Failure(1).result?  # => true
 ## Option
 
 ```ruby
+Some(1).some?                          # #=> true
+Some(1).none?                          # #=> false
+None.some?                             # #=> false
+None.none?                             # #=> true
+
 Some(1).fmap { |n| n + 1 }             # => Some(2)
+None.fmap { |n| n + 1 }                # => None
+
 Some(1).map  { |n| Some(n + 1) }       # => Some(2)
 Some(1).map  { |n| None }              # => None
+None.map     { |n| Some(n + 1) }       # => None
+
 Some(1).value                          # => 1
 Some(1).value_or(2)                    # => 1
-None.map     { |n| Some(n + 1) }       # => None
 None.value                             # => NoMethodError
 None.value_or(0)                       # => 0
 ```

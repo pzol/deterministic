@@ -64,13 +64,15 @@ module Deterministic
 
     class None < Option
       class << self; public :new; end
-      def initialize(*args); end
+      def initialize(*args)
+        @value = self
+      end
 
       def inspect
         "None"
       end
 
-      undef :value
+      private :value
 
       def fmap(*args)
         self
@@ -81,10 +83,6 @@ module Deterministic
       def ==(other)
         other.class == self.class
       end
-
-      # def value
-      #   self # raise "value called on a None"
-      # end
     end
   end
 

@@ -11,6 +11,7 @@ describe Deterministic::Option do
 
   # any?
   specify { expect(described_class.any?(nil)).to be_none }
+  specify { expect(described_class.any?(None)).to be_none }
   specify { expect(described_class.any?("")).to  be_none }
   specify { expect(described_class.any?([])).to  be_none }
   specify { expect(described_class.any?({})).to  be_none }
@@ -21,22 +22,39 @@ describe Deterministic::Option do
   specify { expect(described_class.try! { raise "error" }).to be_none }
 end
 
-describe Deterministic::Option::Some do
-   it_behaves_like 'a Monad' do
-    let(:monad) { described_class }
-  end
+describe Deterministic::Option do
+  #  it_behaves_like 'a Monad' do
+  #   let(:monad) { described_class }
+  # end
 
-  specify { expect(described_class.new(0)).to be_a Option::Some }
-  specify { expect(described_class.new(0)).to eq Some(0) }
-  specify { expect(described_class.new(0).some?).to be_truthy }
-  specify { expect(described_class.new(0).none?).to be_falsey }
-  specify { expect(described_class.new(0).value).to eq 0 }
-  specify { expect(described_class.new(1).value_or(2)).to eq 1}
+  specify { expect(Option::Some.new(0)).to be_a Option::Some }
+  specify { expect(Option::Some.new(0)).to eq Some(0) }
 
-  specify { expect(described_class.new(1).fmap { |n| n + 1}).to eq Some(2) }
-  specify { expect(described_class.new(1).map { |n| Some(n + 1)}).to eq Some(2) }
-  specify { expect(described_class.new(1).map { |n| None }).to eq None }
+  specify { expect(Option::None.new).to eq Option::None.new }
+  specify { expect(Option::None.new).to eq None }
 
+  # some?, none?
+  specify { expect(None.some?).to be_falsey }
+  specify { expect(None.none?).to be_truthy }
+  specify { expect(Some(0).some?).to be_truthy }
+  specify { expect(Some(0).none?).to be_falsey }
+
+  # value, value_or
+  specify { expect(Some(0).value).to eq 0 }
+  specify { expect(Some(1).value_or(2)).to eq 1}
+  specify { expect { None.value }.to raise_error NoMethodError }
+  specify { expect(None.value_or(2)).to eq 2}
+
+  # fmap
+  specify { expect(Some(1).fmap { |n| n + 1}).to eq Some(2) }
+  specify { expect(None.fmap { |n| n + 1}).to eq None }
+
+  # map
+  specify { expect(Some(1).map { |n| Some(n + 1)}).to eq Some(2) }
+  specify { expect(Some(1).map { |n| None }).to eq None }
+  specify { expect(None.map { |n| nil }).to eq None }
+
+  # match
   specify {
     expect(
       Some(0).match {
@@ -76,19 +94,14 @@ describe Deterministic::Option::Some do
 
 end
 
+describe Deterministic::Option::Some do
+   it_behaves_like 'a Monad' do
+    let(:monad) { described_class }
+  end
+end
+
 describe Deterministic::Option::None do
-  #  it_behaves_like 'a Monad' do
-  #   let(:monad) { described_class }
-  # end
-
-  specify { expect(described_class.new).to eq None }
-  specify { expect(described_class.new.some?).to be_falsey }
-  specify { expect(described_class.new.none?).to be_truthy }
-  specify { expect { described_class.new.value }.to raise_error NoMethodError }
-  specify { expect(described_class.new.value_or(2)).to eq 2}
-
-  specify { expect(described_class.new.fmap { |n| n + 1}).to eq None }
-  specify { expect(described_class.new.map { |n| nil }).to eq None }
-  specify { expect(described_class.new).to eq Option::None.new }
-  specify { expect(described_class.new).to eq None }
+   it_behaves_like 'a Monad' do
+    let(:monad) { described_class }
+  end
 end
