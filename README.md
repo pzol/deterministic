@@ -59,14 +59,14 @@ Failure(1).bind { |v| Success(v - 1) } # => Success(0)
 Maps a `Success` with the value `a` to another `Result` with the value `b`. It works like `#bind` but only on `Success`.
 
 ```ruby
-Success(1).map { |n| n + 1 }           # => Success(2)
-Failure(0).map { |n| n + 1 }           # => Failure(0)
+Success(1).map { |n| Success(n + 1) }  # => Success(2)
+Failure(0).map { |n| Success(n + 1) }  # => Failure(0)
 ```
 Maps a `Failure` with the value `a` to another `Result` with the value `b`. It works like `#bind` but only on `Failure`.
 
 ```ruby
-Failure(1).map_err { |n| n + 1 }       # => Success(2)
-Success(0).map_err { |n| n + 1 }       # => Success(0)
+Failure(1).map_err { |n| Success(n + 1) } # => Success(2)
+Success(0).map_err { |n| Success(n + 1) } # => Success(0)
 ```
 
 ```ruby
