@@ -286,6 +286,10 @@ Some(1).value                          # => 1
 Some(1).value_or(2)                    # => 1
 None.value                             # => NoMethodError
 None.value_or(0)                       # => 0
+
+Some(1).value_to_a                     # => Some([1])
+Some([1]).value_to_a                   # => Some([1])
+None.value_to_a                        # => None
 ```
 
 ### Coercion

@@ -54,6 +54,11 @@ describe Deterministic::Option do
   specify { expect(Some(1).map { |n| None }).to eq None }
   specify { expect(None.map { |n| nil }).to eq None }
 
+  # to_a
+  specify { expect(Some(1).value_to_a). to eq Some([1])}
+  specify { expect(Some([1]).value_to_a). to eq Some([1])}
+  specify { expect(None.value_to_a). to eq None}
+
   # match
   specify {
     expect(

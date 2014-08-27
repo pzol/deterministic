@@ -45,6 +45,10 @@ module Deterministic
       bind(proc || block)
     end
 
+    ## Convert the inner value to an Array
+    def value_to_a
+      map { self.class.new(Array(value)) }
+    end
     def some?
       is_a? Some
     end
