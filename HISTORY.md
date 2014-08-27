@@ -1,3 +1,12 @@
+## v0.13.0
+
+- Add `Option#value_to_a`
+- Add `Option#+`
+- Make `None` a real monad (little impact on the real world)
+- Add `Either`
+- Add `Option#value_or`
+- `None#value` is now private
+
 ## v0.12.1
 
 - Fix backwards compatibility with Ruby < 2.0.0
