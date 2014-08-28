@@ -114,4 +114,7 @@ module_function
   def Failure(value)
     Result::Failure.new(value)
   end
+
+  Success = Result::Success
+  Failure = Result::Failure
 end
