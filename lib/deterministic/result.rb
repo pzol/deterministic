@@ -40,6 +40,7 @@ module Deterministic
     end
 
     alias :** :pipe
+    alias :<<  :pipe
 
     # `pipe(self: Result(a), op: |Result(a)| -> b) -> Result(a)`
     # Replaces `Success a` with `Result b`. If a `Failure` is passed as argument, it is ignored.
