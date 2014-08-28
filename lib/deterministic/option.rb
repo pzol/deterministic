@@ -79,7 +79,14 @@ module Deterministic
     end
 
     class None < Option
-      class << self; public :new; end
+      class << self
+        public :new
+
+        def instance
+          @instance ||= new
+        end
+      end
+
       def initialize(*args)
         @value = self
       end
@@ -107,6 +114,7 @@ module_function
     Option::Some.new(value)
   end
 
-  None = Deterministic::Option::None.new
+  Some = Deterministic::Option::Some
+  None = Deterministic::Option::None.instance
 end
 # p Deterministic::Option::Some::Match.new(.methods
