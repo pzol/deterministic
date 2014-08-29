@@ -1,9 +1,12 @@
 require 'spec_helper'
 require_relative 'monad_axioms'
 
-include Deterministic
 
 describe Deterministic::Option do
+  include Deterministic
+  Some = Deterministic::Some
+  None = Deterministic::None
+
   # nil?
   specify { expect(described_class.some?(nil)).to eq None }
   specify { expect(described_class.some?(1)).to be_some }
@@ -23,6 +26,9 @@ describe Deterministic::Option do
 end
 
 describe Deterministic::Option do
+  include Deterministic
+  Option = Deterministic::Option
+
   #  it_behaves_like 'a Monad' do
   #   let(:monad) { described_class }
   # end
@@ -109,13 +115,17 @@ describe Deterministic::Option do
 end
 
 describe Deterministic::Option::Some do
-   it_behaves_like 'a Monad' do
+  include Deterministic
+
+  it_behaves_like 'a Monad' do
     let(:monad) { described_class }
   end
 end
 
 describe Deterministic::Option::None do
-   it_behaves_like 'a Monad' do
+  include Deterministic
+
+  it_behaves_like 'a Monad' do
     let(:monad) { described_class }
   end
 end

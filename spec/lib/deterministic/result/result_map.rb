@@ -1,14 +1,17 @@
 require 'spec_helper'
 
-include Deterministic
 
 describe Deterministic::Result do
+  include Deterministic
+
   context ">> (map)" do
     specify { expect(Success(0).map { |n| Success(n + 1) }).to eq Success(1) }
     specify { expect(Failure(0).map { |n| Success(n + 1) }).to eq Failure(0) }
 
     it "Failure stops execution" do
       class ChainUnderTest
+        include Deterministic
+
         alias :m :method
 
         def call
@@ -72,6 +75,8 @@ describe Deterministic::Result do
 
   context "using self as the context for success" do
     class SelfContextUnderTest
+      include Deterministic
+
       def call
         @step = 0
         Success(self).

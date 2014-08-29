@@ -93,7 +93,7 @@ module Deterministic
     def try(proc=nil, &block)
       map(proc, &block)
     rescue => err
-      Failure(err)
+      Result::Failure.new(err)
     end
 
     alias :>= :try
