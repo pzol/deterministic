@@ -13,7 +13,7 @@ describe Deterministic::Enum  do
 
     it "does something" do
       expect(MyEnym.variants).to eq [:Nullary, :Unary, :Binary]
-      expect(MyEnym.constants.inspect).to eq "[:Nullary, :Unary, :Binary, :Matcher, :MatchError]"
+      expect(MyEnym.constants.inspect).to eq "[:Nullary, :Unary, :Binary, :Matcher]"
 
       n = MyEnym::Nullary.new
 
