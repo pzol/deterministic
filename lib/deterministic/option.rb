@@ -117,4 +117,3 @@ module_function
   Some = Deterministic::Option::Some
   None = Deterministic::Option::None.instance
 end
-# p Deterministic::Option::Some::Match.new(.methods
