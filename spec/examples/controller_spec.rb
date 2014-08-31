@@ -15,7 +15,11 @@ class BookingController
   Context = Struct.new(:booking, :ability, :format)
 
   def index(id, format=:html)
+<<<<<<< HEAD
     get_booking(id)           << log(:booking) >>
+=======
+    p get_booking(id)         << log(:booking) >>
+>>>>>>> Add controller example
     py(:ability)              << log(:ability) >>
     py(:present, format)      << log(:presenter) >>
     py(:render)               << log(:render)
