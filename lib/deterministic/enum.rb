@@ -20,14 +20,6 @@ module Deterministic
         def parent
           eval(self.class.name.split("::")[-2])
         end
-
-        def pretty_name
-          self.class.name.split("::")[-1]
-        end
-        
-        def value
-          @value
-        end
       end
 
       module Nullary
@@ -35,12 +27,8 @@ module Deterministic
           @value = []
         end
 
-        def to_s
-          ""
-        end
-
         def inspect
-            pretty_name
+          self.class.name.split("::")[-1]
         end
       end
 
@@ -50,6 +38,7 @@ module Deterministic
         end
 
         def inspect
+          pretty_name = self.class.name.split("::")[-1]
           params = args.zip(@value).map { |e| "#{e[0]}: #{e[1].inspect}" }
           "#{pretty_name}(#{params.join(", ")})"
         end
@@ -120,31 +109,27 @@ module_function
 
           obj, type, block, args, guard = match
           
-          if args.count == 0
-            return instance_exec(obj, &block)
-          else
+          if args.count > 0
             raise Enum::MatchError, "Pattern (#{args.join(', ')}) must match (#{obj.args.join(', ')})" if args.count != obj.value.count
-            context = exec_context(obj, args)
+            context = Struct.new(*args).new(*obj.value)
 
             if guard 
-              if context.instance_exec(obj, &guard)
-                return context.instance_exec(obj, &block)
+              if context.instance_exec(*(obj.value), &guard)
+                return context.instance_exec(*(obj.value), &block)
               end
             else
-              return context.instance_exec(obj, &block)
+              return context.instance_exec(*(obj.value), &block)
             end
+          else
+            return instance_exec(&block)
           end
         }
 
         raise Enum::MatchError, "No match could be made"
       end
-
+      
+      include Enum
       def self.variants; constants - [:Matcher, :MatchError]; end
-
-      private
-      def self.exec_context(obj, args)
-        Struct.new(*(args + [:self])).new(*(obj.value + [obj]))
-      end
     end
     enum = EnumBuilder.new(mod)
     enum.instance_eval(&block)
