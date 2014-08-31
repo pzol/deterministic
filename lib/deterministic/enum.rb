@@ -109,27 +109,31 @@ module_function
 
           obj, type, block, args, guard = match
           
-          if args.count > 0
+          if args.count == 0
+            return instance_exec(obj, &block)
+          else
             raise Enum::MatchError, "Pattern (#{args.join(', ')}) must match (#{obj.args.join(', ')})" if args.count != obj.value.count
-            context = Struct.new(*args).new(*obj.value)
+            context = exec_context(obj, args)
 
             if guard 
-              if context.instance_exec(*(obj.value), &guard)
-                return context.instance_exec(*(obj.value), &block)
+              if context.instance_exec(obj, &guard)
+                return context.instance_exec(obj, &block)
               end
             else
-              return context.instance_exec(*(obj.value), &block)
+              return context.instance_exec(obj, &block)
             end
-          else
-            return instance_exec(&block)
           end
         }
 
         raise Enum::MatchError, "No match could be made"
       end
-      
-      include Enum
+
       def self.variants; constants - [:Matcher, :MatchError]; end
+
+      private
+      def self.exec_context(obj, args)
+        Struct.new(*(args + [:self])).new(*(obj.value + [obj]))
+      end
     end
     enum = EnumBuilder.new(mod)
     enum.instance_eval(&block)
