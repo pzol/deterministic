@@ -1,8 +1,5 @@
 module Functor
   def fmap(&fn)
-    match {
-      Some(a) { Some.new(fn.(a)) }
-      None() { |n| n }
-    }
+    self.class.new(*value.map { |e| fn.(e) })
   end
 end
