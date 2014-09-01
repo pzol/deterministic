@@ -50,13 +50,6 @@ module Deterministic
       other
     end
 
-    # `and_then(self: Success(a), op: |a| -> Result(b)) -> Result(b)`
-    # Replaces `Success a` with the result of the block. If a `Failure` is passed as argument, it is ignored.
-    def and_then(&block)
-      return self if failure?
-      bind(&block)
-    end
-
     # `or(self: Failure(a), other: Result(b)) -> Result(b)` 
     # Replaces `Failure a` with `Result`. If a `Failure` is passed as argument, it is ignored.
     def or(other)
@@ -80,6 +73,7 @@ module Deterministic
     end
 
     alias :>> :map
+    alias :and_then :map
 
     # `map_err(self: Failure(a), op: |a| -> Result(b)) -> Result(b)`
     # Maps a `Failure` with the value `a` to another `Result` with the value `b`. It works like `#bind` but only on `Failure`.
