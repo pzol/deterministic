@@ -58,13 +58,6 @@ module Deterministic
       return other
     end
 
-    # `or_else(self: Failure(a),  op: |a| -> Result(b)) -> Result(b)`
-    # Replaces `Failure a` with the result of the block. If a `Success` is passed as argument, it is ignored.
-    def or_else(&block)
-      return self if success?
-      bind(&block)
-    end
-
     # `map(self: Success(a), op: |a| -> Result(b)) -> Result(b)`
     # Maps a `Success` with the value `a` to another `Result` with the value `b`. It works like `#bind` but only on `Success`.
     def map(proc=nil, &block)
@@ -81,6 +74,8 @@ module Deterministic
       return self if success?
       bind(proc || block)
     end
+
+    alias :or_else :map_err
 
     # `pipe(self: Result(a), op: |Result(a)| -> b) -> Result(a)`
     # Executes the block passed, but completely ignores its result. If an error is raised within the block it will **NOT** be catched.
