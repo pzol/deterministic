@@ -24,6 +24,10 @@ module Deterministic
         def pretty_name
           self.class.name.split("::")[-1]
         end
+        
+        def value
+          @value
+        end
       end
 
       module Nullary
