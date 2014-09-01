@@ -20,6 +20,10 @@ module Deterministic
         def parent
           eval(self.class.name.split("::")[-2])
         end
+
+        def pretty_name
+          self.class.name.split("::")[-1]
+        end
       end
 
       module Nullary
@@ -27,8 +31,12 @@ module Deterministic
           @value = []
         end
 
+        def to_s
+          ""
+        end
+
         def inspect
-          self.class.name.split("::")[-1]
+            pretty_name
         end
       end
 
@@ -38,7 +46,6 @@ module Deterministic
         end
 
         def inspect
-          pretty_name = self.class.name.split("::")[-1]
           params = args.zip(@value).map { |e| "#{e[0]}: #{e[1].inspect}" }
           "#{pretty_name}(#{params.join(", ")})"
         end
