@@ -2,9 +2,9 @@ require 'spec_helper'
 require_relative '../monad_axioms'
 require_relative 'result_shared'
 
-include Deterministic
 
 describe Deterministic::Result::Failure do
+  include Deterministic
 
   it_behaves_like 'a Monad' do
     let(:monad) { described_class }
@@ -40,6 +40,8 @@ end
 
 
 describe "Chaining" do
+  include Deterministic
+
   it "#or" do
     expect(Success(1).or(Failure(2))).to eq Success(1)
     expect(Failure(1).or(Success(2))).to eq Success(2)

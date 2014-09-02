@@ -1,8 +1,9 @@
 require 'spec_helper'
 
-include Deterministic
 
 describe Deterministic::Result::Match do
+  include Deterministic
+
   it "can match Success" do
     expect(
       Success(1).match do
