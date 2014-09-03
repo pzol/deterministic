@@ -1,50 +1,73 @@
 require 'deterministic/enum'
-require_relative 'functor'
 
-Optional = Deterministic::enum {
-  Some(:s)
-  None()
-}
+module Deterministic
+  Option = Deterministic::enum {
+    Some(:s)
+    None()
+  }
 
-Deterministic::impl(Optional) {
-  include Functor
+  class Option  
+    class << self
+      def some?(expr)
+        to_option(expr) { expr.nil? }
+      end
 
-  class NoneValueError < StandardError; end
+      def any?(expr)
+        to_option(expr) { expr.nil? || not(expr.respond_to?(:empty?)) || expr.empty? }
+      end
 
-  alias :map :fmap
+      def to_option(expr, &predicate)
+        predicate.call(expr) ? None.new : Some.new(expr)
+      end
 
-  def some?
-    is_a? Optional::Some
+      def try!
+        yield rescue None.new
+      end
+    end
   end
 
-  def none?
-    is_a? Optional::None
-  end
+  impl(Option) {
+    class NoneValueError < StandardError; end
 
-  def unwrap
-    match {
-      Some(s) { s }
-      None()  { raise NoneValueError }
-    }
-  end
-
-  def unwrap_or(n)
-    match {
-      Some(s) { s }
-      None()  { n }
-    }
-  end
-
-  def +(other)
-    match {
-      None()  { other}
-      Some(_) { |t| t.fmap { |s|
-          other.match {
-            Some(os) { s + os }
-            None()   { s }
-          }
-        }
+    def fmap(&fn)
+      match {
+        Some(s) { |m| m.class.new(fn.(s)) }
+        None()  { |n| n }
       }
-    }
-  end
-}
+    end 
+
+    def map(&fn)
+      match {
+        Some(s) { |m| m.bind(&fn) }
+        None()  { |n| n }
+      }
+    end 
+
+    def some?
+      is_a? Option::Some
+    end
+
+    def none?
+      is_a? Option::None
+    end
+
+    def value_or(n)
+      match {
+        Some(s) { s }
+        None()  { n }
+      }
+    end
+
+    def value_to_a
+      @value
+    end
+
+    def +(other)
+      match {
+        None() { other }
+        Some(s, where { other.some? }) { Option::Some.new(s + other.value) }
+        Some(_) { |s| s }
+      }
+    end
+  }
+end

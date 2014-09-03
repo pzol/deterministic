@@ -7,24 +7,35 @@ describe Deterministic::Enum  do
   context "Nullary, Unary, Binary" do
     MyEnym = Deterministic::enum {
       Nullary()
-      Unary(:i)
+      Unary(:a)
       Binary(:a, :b)
     }
 
-    it "does something" do
+    it "Nullary" do
+      n = MyEnym::Nullary.new
+      expect(n).to be_a MyEnym::Nullary
+      expect { n.value }.to raise_error
+      expect(n.inspect).to eq "Nullary"
+      expect(n.to_s).to eq ""
+      expect(n.fmap { }).to eq n
+      expect(n.inner_value).to eq []
+    end
+
+    it "Unary" do
+      u= MyEnym::Unary.new(1)
+
+      expect(u).to be_a MyEnym::Unary
+      expect(u.a).to eq 1
+      expect(u.value).to eq 1
+      expect(u.inspect).to eq "Unary(1)"
+      expect(u.to_s).to eq "1"
+      expect(u.inner_value).to eq [1]
+    end
+
+    it "generated enum" do
       expect(MyEnym.variants).to eq [:Nullary, :Unary, :Binary]
       expect(MyEnym.constants.inspect).to eq "[:Nullary, :Unary, :Binary, :Matcher]"
 
-      n = MyEnym::Nullary.new
-
-      expect(n).to be_a MyEnym::Nullary
-
-      u = MyEnym::Unary.new(1)
-
-      expect(u.value).to eq [1]
-      expect(u).to be_a MyEnym::Unary
-      expect(u.i).to eq 1
-      expect(u.inspect).to eq "Unary(i: 1)"
 
       b = MyEnym::Binary.new(1, 2)
 

@@ -27,8 +27,19 @@ module Deterministic
     # the self.class, i.e. the containing monad is passed as a second (optional) arg to the function
     def bind(proc=nil, &block)
       (proc || block).call(value).tap do |result|
-        parent = self.class.superclass === Object ? self.class : self.class.superclass
-        raise NotMonadError, "Expected #{result.inspect} to be an #{parent}" unless result.is_a? parent
+
+        def parent_name(obj)
+          parts = obj.class.name.split('::')
+          if parts.count > 1
+            parts[0..-2].join('::')
+          else
+            parts[0]
+          end
+        end
+
+        self_parent  = parent_name(self)
+        other_parent = parent_name(result)
+        raise NotMonadError, "Expected #{result.inspect} to be an #{other_parent}" unless self_parent == other_parent
       end
     end
     alias :'>>=' :bind
