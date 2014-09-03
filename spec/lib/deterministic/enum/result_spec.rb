@@ -7,10 +7,9 @@ Resultal = Deterministic::enum {
 }
 
 Deterministic::impl(Resultal) {
-
   def map(&fn)
     match {
-      Success(_) { |s| s.fmap(&fn) }
+      Success(_) { |s| s.bind(&fn) }
       Failure(_) { |f| f }
     }
   end
@@ -67,8 +66,8 @@ describe Resultal do
   end
 
   it "map" do
-    expect(Success(1).map { |n| n + 1}).to eq Success(2)
-    expect(Failure(0).map { |n| n + 1}).to eq Failure(0)
+    expect(Success(1).map { |n| Success(n + 1)}).to eq Success(2)
+    expect(Failure(0).map { |n| Success(n + 1)}).to eq Failure(0)
   end
 
   subject { Success(1) }
