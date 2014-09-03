@@ -68,11 +68,19 @@ module Deterministic
       end
 
       module Binary
-        def initialize(*args)
-          @value = args
+        def initialize(*init)
+          raise ArgumentError, "Expected arguments for #{args}, got #{init}" unless (init.count == 1 && init[0].is_a?(Hash)) || init.count == args.count
+          if init[0].is_a? Hash
+            @value = init[0].values
+          else
+            @value = init
+          end
         end
 
-        attr_reader :value
+        # attr_reader :value
+        def value
+          Hash[args.zip(@value)]
+        end
 
         def inspect
           params = args.zip(@value).map { |e| "#{e[0]}: #{e[1].inspect}" }
