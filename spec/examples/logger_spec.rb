@@ -46,7 +46,11 @@ class Logger
 class Ensure
   include Deterministic
   include Deterministic::Monad
-  None = Deterministic::Option::None.instance
+
+  None = Deterministic::Option::None.new
+  def Some(value)
+    Option::Some.new(value)
+  end
 
   attr_accessor :value
 
@@ -94,13 +98,14 @@ class Validator < Ensure
   end
 
   def call
-    not_empty + is_a(Array) + None + has_key(:tenant) + Some("error").value_to_a + date_is_one + required_params
+    not_empty + is_a(Array) + None + has_key(:tenant) + Some(["error"]) #+ date_is_one + required_params
   end
 
 end
 
 describe Ensure do
-  # None = Deterministic::Option::None.instance
+  None = Deterministic::Option::None.new
+  Some = Deterministic::Option::Some
   
   it "Ensure" do
     params = {date: 2}
@@ -108,7 +113,7 @@ describe Ensure do
     v = Validator.new(params)
 
     errors = v.call
-    expect(errors).to be_a Deterministic::Some
+    expect(errors).to be_a Some
     expect(errors.value).not_to be_empty
   end
 end

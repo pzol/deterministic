@@ -8,11 +8,11 @@ module Deterministic
       @mod = mod
     end
 
-
     class DataType
-      include Deterministic::Monad
 
       module AnyEnum
+        include Deterministic::Monad
+
         def match(&block)
           parent.match(self, &block)
         end
@@ -21,13 +21,18 @@ module Deterministic
           eval(self.class.name.split("::")[-2])
         end
 
-        def pretty_name
-          self.class.name.split("::")[-1]
+        def to_s
+          value.to_s
         end
-        
-        def value
+
+        def inner_value
           @value
         end
+
+      private
+        def pretty_name
+          self.class.name.split("::")[-1]
+        end        
       end
 
       module Nullary
@@ -39,8 +44,26 @@ module Deterministic
           ""
         end
 
+        def value
+          @value
+        end
+
         def inspect
             pretty_name
+        end
+      end
+
+      module Unary
+        def initialize(arg)
+          @value = [arg]
+        end
+
+        def value
+          @value[0]
+        end
+
+        def inspect
+          "#{pretty_name}(#{value})"
         end
       end
 
@@ -49,11 +72,12 @@ module Deterministic
           @value = args
         end
 
+        attr_reader :value
+
         def inspect
           params = args.zip(@value).map { |e| "#{e[0]}: #{e[1].inspect}" }
           "#{pretty_name}(#{params.join(", ")})"
         end
-
       end
 
       def self.create(name, args)
@@ -61,16 +85,22 @@ module Deterministic
 
         if args.count == 0
           dt.instance_eval {
-            include Deterministic::Monad
-            include Nullary
             include AnyEnum
+            include Nullary
             private :value
+          }
+        elsif args.count == 1
+          dt.instance_eval {
+            include AnyEnum
+            include Unary
+
+            define_method(args[0].to_sym) { value }
+            define_method(:args) { args }
           }
         else
           dt.instance_eval {
-            include Deterministic::Monad
-            include Binary
             include AnyEnum
+            include Binary
 
             define_method(:args) { args }
 
@@ -91,7 +121,6 @@ module Deterministic
       def initialize(*args)
         @value = None
       end
-
 
       def self.inspect 
         "Deterministic::Enum::Empty"
@@ -117,13 +146,12 @@ module_function
         type_matches = matcher.matches.select { |r| r[0].is_a?(r[1]) }
 
         type_matches.each { |match|
-
           obj, type, block, args, guard = match
           
           if args.count == 0
             return instance_exec(obj, &block)
           else
-            raise Enum::MatchError, "Pattern (#{args.join(', ')}) must match (#{obj.args.join(', ')})" if args.count != obj.value.count
+            raise Enum::MatchError, "Pattern (#{args.join(', ')}) must match (#{obj.args.join(', ')})" if args.count != obj.args.count
             context = exec_context(obj, args)
 
             if guard 
@@ -143,7 +171,7 @@ module_function
 
       private
       def self.exec_context(obj, args)
-        Struct.new(*(args + [:self])).new(*(obj.value + [obj]))
+        Struct.new(*(args + [:this])).new(*(obj.inner_value + [obj]))
       end
     end
     enum = EnumBuilder.new(mod)
