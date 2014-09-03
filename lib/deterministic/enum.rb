@@ -117,14 +117,6 @@ module Deterministic
       class << self
         public :new; 
       end
-
-      def initialize(*args)
-        @value = None
-      end
-
-      def self.inspect 
-        "Deterministic::Enum::Empty"
-      end
     end
 
     def method_missing(m, *args)
