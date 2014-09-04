@@ -57,6 +57,7 @@ module Deterministic
         dt = Class.new(parent)
 
         dt.instance_eval {
+          class << self; public :new; end
           include AnyEnum
           define_method(:args) { args }
 
@@ -100,6 +101,8 @@ module Deterministic
 module_function
   def enum(&block)
     mod = Class.new do # the enum to be built
+      class << self; private :new; end
+
       def self.match(obj, &block)
         matcher = self::Matcher.new(obj)
         matcher.instance_eval(&block)
