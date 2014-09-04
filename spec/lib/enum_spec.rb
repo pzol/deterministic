@@ -4,7 +4,7 @@ require 'deterministic/enum'
 describe Deterministic::Enum  do
   include Deterministic
 
-  it "value" do
+  it "can't use value" do
     expect { InvalidEnum = Deterministic::enum {
       Unary(:value)
     }}.to raise_error ArgumentError
@@ -16,6 +16,10 @@ describe Deterministic::Enum  do
       Unary(:a)
       Binary(:a, :b)
     }
+
+    it "can't instantiate parent" do
+      expect { MyEnym.new }.to raise_error NoMethodError, "private method `new' called for MyEnym:Class"
+    end
 
     it "Nullary" do
       n = MyEnym::Nullary.new
