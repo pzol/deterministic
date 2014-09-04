@@ -9,10 +9,17 @@ describe Deterministic::Option do
   def Some(s); Some.new(s); end
 
   specify { expect(described_class::Some.new(0)).to be_a described_class::Some }
+  specify { expect(described_class::Some.new(0)).to be_a described_class }
   specify { expect(described_class::Some.new(0)).to eq Some(0) }
 
   specify { expect(described_class::None.new).to eq described_class::None.new }
+  specify { expect(described_class::None.new).to be_a described_class::None }
+  specify { expect(described_class::None.new).to be_a described_class }
   specify { expect(described_class::None.new).to eq None }
+
+  it "join" do
+    expect(Some(Some(1))).to eq Some(1)
+  end
 
   it "fmap" do
     expect(Some(1).fmap { |n| n + 1}).to eq Some(2)
@@ -53,6 +60,7 @@ describe Deterministic::Option do
     expect(None + None + Some(1)).to eq Some(1)
     expect(None + None + Some(1) + None).to eq Some(1)
     expect(None + Some({foo: 1})).to eq Some({:foo=>1})
+    expect(Some([1]) + Some([1])).to eq Some([1, 1])
     expect { Some([1]) + Some(1)}.to raise_error TypeError
   end
 
@@ -104,11 +112,9 @@ describe Deterministic::Option::Some do
   end
 end
 
-describe Deterministic::Option::None do
-  pending {
-   it_behaves_like 'a Monad' do
+# describe Deterministic::Option::None do
+#    it_behaves_like 'a Monad' do
   
-    let(:monad) { described_class }
-  end
-}
-end
+#     let(:monad) { described_class }
+#   end
+# end

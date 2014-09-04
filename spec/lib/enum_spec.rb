@@ -4,6 +4,12 @@ require 'deterministic/enum'
 describe Deterministic::Enum  do
   include Deterministic
 
+  it "value" do
+    expect { InvalidEnum = Deterministic::enum {
+      Unary(:value)
+    }}.to raise_error ArgumentError
+  end
+
   context "Nullary, Unary, Binary" do
     MyEnym = Deterministic::enum {
       Nullary()
@@ -14,32 +20,32 @@ describe Deterministic::Enum  do
     it "Nullary" do
       n = MyEnym::Nullary.new
 
+      expect(n).to be_a MyEnym
       expect(n).to be_a MyEnym::Nullary
       expect { n.value }.to raise_error
       expect(n.inspect).to eq "Nullary"
       expect(n.to_s).to eq ""
       expect(n.fmap { }).to eq n
-      expect(n.inner_value).to eq []
     end
 
     it "Unary" do
       u = MyEnym::Unary.new(1)
 
+      expect(u).to be_a MyEnym
       expect(u).to be_a MyEnym::Unary
       expect(u.a).to eq 1
       expect(u.value).to eq 1
       expect(u.inspect).to eq "Unary(1)"
       expect(u.to_s).to eq "1"
-      expect(u.inner_value).to eq [1]
     end
 
     it "Binary" do
       # hash
       b = MyEnym::Binary.new(a: 1, b: 2)
+      expect(b).to be_a MyEnym
       expect(b).to be_a MyEnym::Binary
       expect(b.inspect).to eq "Binary(a: 1, b: 2)"
 
-      expect(b.inner_value).to eq([1, 2])
       expect(b.a).to eq 1
       expect(b.b).to eq 2
       expect(b.value).to eq({a: 1, b: 2})

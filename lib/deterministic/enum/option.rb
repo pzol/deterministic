@@ -65,6 +65,7 @@ module Deterministic
     def +(other)
       match {
         None() { other }
+        Some(_, where { !other.is_a?(Option)}) { raise TypeError, "Other must be an #{Option}"}
         Some(s, where { other.some? }) { Option::Some.new(s + other.value) }
         Some(_) { |s| s }
       }
