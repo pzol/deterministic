@@ -3,15 +3,15 @@ module Deterministic
     class NotMonadError < StandardError; end
 
     # Basicly the `pure` function
-    def initialize(value)
-      @value = join(value)
+    def initialize(init)
+      @value = join(init)
     end
 
     # If the passed value is monad already, get the value to avoid nesting
     # M[M[A]] is equivalent to M[A]
-    def join(value)
-      if value.is_a? self.class then value.value
-      else value end
+    def join(other)
+      if other.is_a? self.class then other.value
+      else other end
     end
 
     # The functor: takes a function (a -> b) and applies it to the inner value of the monad (Ma),
@@ -28,18 +28,21 @@ module Deterministic
     def bind(proc=nil, &block)
       (proc || block).call(value).tap do |result|
 
-        def parent_name(obj)
-          parts = obj.class.name.split('::')
-          if parts.count > 1
-            parts[0..-2].join('::')
-          else
-            parts[0]
-          end
-        end
+        # def parent_name(obj)
+        #   parts = obj.class.name.split('::')
+        #   if parts.count > 1
+        #     parts[0..-2].join('::')
+        #   else
+        #     parts[0]
+        #   end
+        # end
 
-        self_parent  = parent_name(self)
-        other_parent = parent_name(result)
-        raise NotMonadError, "Expected #{result.inspect} to be an #{other_parent}" unless self_parent == other_parent
+        # self_parent  = parent_name(self)
+        # other_parent = parent_name(result)
+        # raise NotMonadError, "Expected #{result.inspect} to be an #{other_parent}" unless self_parent == other_parent
+
+        parent = self.class.superclass === Object ? self.class : self.class.superclass
+        raise NotMonadError, "Expected #{result.inspect} to be an #{parent}" unless result.is_a? parent
       end
     end
     alias :'>>=' :bind
