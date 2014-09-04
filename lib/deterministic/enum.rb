@@ -4,12 +4,11 @@ module Deterministic
   end
 
   class EnumBuilder
-    def initialize(mod)
-      @mod = mod
+    def initialize(parent)
+      @parent = parent
     end
 
     class DataType
-
       module AnyEnum
         include Deterministic::Monad
 
@@ -17,16 +16,8 @@ module Deterministic
           parent.match(self, &block)
         end
 
-        def parent
-          eval(self.class.name.split("::")[-2])
-        end
-
         def to_s
           value.to_s
-        end
-
-        def inner_value
-          @value
         end
 
       private
@@ -37,84 +28,58 @@ module Deterministic
 
       module Nullary
         def initialize(*args)
-          @value = []
-        end
-
-        def to_s
-          ""
-        end
-
-        def value
-          @value
+          @value = nil
         end
 
         def inspect
-            pretty_name
-        end
-      end
-
-      module Unary
-        def initialize(arg)
-          @value = [arg]
-        end
-
-        def value
-          @value[0]
-        end
-
-        def inspect
-          "#{pretty_name}(#{value})"
+          pretty_name
         end
       end
 
       module Binary
         def initialize(*init)
           raise ArgumentError, "Expected arguments for #{args}, got #{init}" unless (init.count == 1 && init[0].is_a?(Hash)) || init.count == args.count
-          if init[0].is_a? Hash
-            @value = init[0].values
+          if init.count == 1 && init[0].is_a?(Hash)
+            @value = Hash[args.zip(init[0].values)]
           else
-            @value = init
+            @value = Hash[args.zip(init)]
           end
         end
 
-        # attr_reader :value
-        def value
-          Hash[args.zip(@value)]
-        end
-
         def inspect
-          params = args.zip(@value).map { |e| "#{e[0]}: #{e[1].inspect}" }
-          "#{pretty_name}(#{params.join(", ")})"
+          params = value.map { |k, v| "#{k}: #{v.inspect}" }
+          "#{pretty_name}(#{params.join(', ')})"
         end
       end
 
-      def self.create(name, args)
-        dt = Class.new
+      def self.create(parent, name, args)
+        raise ArgumentError, "#{args} may not contain the reserved name :value" if args.include? :value
+        dt = Class.new(parent)
+
+        dt.instance_eval {
+          include AnyEnum
+          define_method(:args) { args }
+
+          define_method(:parent) { parent }
+          private :parent
+        }
 
         if args.count == 0
           dt.instance_eval {
-            include AnyEnum
             include Nullary
             private :value
           }
         elsif args.count == 1
           dt.instance_eval {
-            include AnyEnum
-            include Unary
-
             define_method(args[0].to_sym) { value }
-            define_method(:args) { args }
           }
         else
           dt.instance_eval {
-            include AnyEnum
             include Binary
 
-            define_method(:args) { args }
-
-            args.each_with_index do |m, i|
+            args.each do |m|
               define_method(m) do
-                @value[i]
+                @value[m]
               end
             end
           }
@@ -128,7 +93,7 @@ module Deterministic
     end
 
     def method_missing(m, *args)
-      @mod.const_set(m, DataType.create(m, args))
+      @parent.const_set(m, DataType.create(@parent, m, args))
     end
   end
 
@@ -171,7 +136,11 @@ module_function
 
       private
       def self.exec_context(obj, args)
-        Struct.new(*(args + [:this])).new(*(obj.inner_value + [obj]))
+        if obj.is_a?(Deterministic::EnumBuilder::DataType::Binary)
+          Struct.new(*(args)).new(*(obj.value.values))
+        else
+          Struct.new(*(args)).new(obj.value)
+        end
       end
     end
     enum = EnumBuilder.new(mod)
