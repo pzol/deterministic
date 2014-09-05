@@ -1,5 +1,3 @@
-require 'deterministic/enum'
-
 module Deterministic
   Option = Deterministic::enum {
     Some(:s)
@@ -71,4 +69,12 @@ module Deterministic
       }
     end
   }
+
+  module Prelude
+    module Option
+      None = Deterministic::Option::None.new
+      def Some(s); Deterministic::Option::Some.new(s); end
+      def None(); Deterministic::Prelude::Option::None; end
+    end
+  end
 end
