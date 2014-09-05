@@ -32,7 +32,7 @@ describe List do
       expect {
         list.match {
           Cons(_, _, where { true == false }) { 1 }
-          Nil(where { true == false }) { 0 } 
+          Nil(where { true == false }) { 0 }
         }
       }.to raise_error(Deterministic::Enum::MatchError)
     end
