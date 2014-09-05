@@ -6,7 +6,8 @@ module Deterministic; end
 
 require 'deterministic/monad'
 require 'deterministic/match'
-require 'deterministic/result'
+require 'deterministic/enum'
+require 'deterministic/enum/result'
 require 'deterministic/enum/option'
 require 'deterministic/either'
 require 'deterministic/null'
