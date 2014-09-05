@@ -1,64 +1,7 @@
 require 'spec_helper'
-require 'deterministic/enum'
 
-Resultal = Deterministic::enum {
-  Success(:s)
-  Failure(:f)
-}
-
-Deterministic::impl(Resultal) {
-  def map(&fn)
-    match {
-      Success(_) { |s| s.bind(&fn) }
-      Failure(_) { |f| f }
-    }
-  end
-
-  alias :and_then :map
-
-  def map_err(&fn)
-    match {
-      Success(_) { |s| s }
-      Failure(_) { |f| f.fmap(&fn) }
-    }
-  end
-
-  alias :or_else :map_err
-
-  def pipe(&fn)
-    fn.call(self)
-    self
-  end
-
-  def success?
-    is_a? Resultal::Success
-  end
-
-  def failure?
-    is_a? Resultal::Failure
-  end
-
-  def or(other)
-    match {
-      Success(_) { |s| s }
-      Failure(_) { other}
-    }
-  end
-
-  def and(other)
-    match {
-      Success(_) { other }
-      Failure(_) { |f| f }
-    }
-  end
-}
-
-describe Resultal do
-  Success = described_class::Success
-  Failure = described_class::Failure
-
-  def Success(s); Success.new(s); end
-  def Failure(f); Failure.new(f); end
+describe Deterministic::Result do
+  include Deterministic::Prelude::Result
 
   it "fmap" do
     expect(Success(1).fmap { |n| n + 1}).to eq Success(2)
@@ -77,7 +20,7 @@ describe Resultal do
   specify { expect(subject.success?).to be_truthy }
   specify { expect(subject.failure?).to be_falsey }
 
-  # specify { expect(subject).to be_a described_class }
+  specify { expect(subject).to be_a described_class }
   # specify { expect(subject).to eq(described_class.new(1)) }
   specify { expect(subject.fmap { |v| v + 1} ).to eq Success(2) }
   specify { expect(subject.map { |v| Failure(v + 1) } ).to eq Failure(2) }

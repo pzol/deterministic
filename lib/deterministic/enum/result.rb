@@ -1,0 +1,70 @@
+
+module Deterministic
+  Result = Deterministic::enum {
+    Success(:s)
+    Failure(:f)
+  }
+
+  Deterministic::impl(Result) {
+    def map(proc=nil, &block)
+      match {
+        Success(_) { |s| s.bind(proc || block) }
+        Failure(_) { |f| f }
+      }
+    end
+
+    alias :>> :map
+    alias :and_then :map
+
+    def map_err(proc=nil, &block)
+      match {
+        Success(_) { |s| s }
+        Failure(_) { |f| f.bind(proc|| block) }
+      }
+    end
+
+    alias :or_else :map_err
+
+    def pipe(proc=nil, &block)
+      (proc || block).call(self)
+      self
+    end
+
+    alias :<< :pipe
+
+    def success?
+      is_a? Result::Success
+    end
+
+    def failure?
+      is_a? Result::Failure
+    end
+
+    def or(other)
+      raise Deterministic::Monad::NotMonadError, "Expected #{other.inspect} to be an Result" unless other.is_a? Result
+      match {
+        Success(_) { |s| s }
+        Failure(_) { other}
+      }
+    end
+
+    def and(other)
+      raise Deterministic::Monad::NotMonadError, "Expected #{other.inspect} to be an Result" unless other.is_a? Result
+      match {
+        Success(_) { other }
+        Failure(_) { |f| f }
+      }
+    end
+  }
+end
+
+module Deterministic
+  module Prelude
+    module Result
+      def Success(s); Deterministic::Result::Success.new(s); end
+      def Failure(f); Deterministic::Result::Failure.new(f); end
+    end
+
+    include Result
+  end
+end

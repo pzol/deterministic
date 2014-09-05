@@ -9,7 +9,7 @@ module Deterministic
 end
 
 class BookingController
-  include Deterministic
+  include Deterministic::Prelude::Result
   include Deterministic::Procify
 
   Context = Struct.new(:booking, :ability, :format)

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 
 describe Deterministic::Result do
-  include Deterministic
+  include Deterministic::Prelude::Result
 
   context ">> (map)" do
     specify { expect(Success(0).map { |n| Success(n + 1) }).to eq Success(1) }
@@ -10,8 +10,7 @@ describe Deterministic::Result do
 
     it "Failure stops execution" do
       class ChainUnderTest
-        include Deterministic
-
+        include Deterministic::Prelude::Result
         alias :m :method
 
         def call
@@ -75,7 +74,7 @@ describe Deterministic::Result do
 
   context "using self as the context for success" do
     class SelfContextUnderTest
-      include Deterministic
+      include Deterministic::Prelude::Result
 
       def call
         @step = 0
@@ -124,7 +123,7 @@ describe Deterministic::Result do
     end
   end
 
-  context "** (pipe)" do
+  context "<< (pipe)" do
     it "ignores the output of pipe" do
       acc = "ctx: "
       log = ->(ctx) { acc += ctx.inspect }
@@ -134,16 +133,17 @@ describe Deterministic::Result do
       expect(acc).to eq "ctx: Success(1)"
     end
 
-    it "works with **" do
+    it "works with <<" do
       log = ->(n) { n.value + 1 }
       foo = ->(n) { Success(n + 1) }
 
-      actual = Success(1) ** log >> foo 
+      actual = Success(1) << log >> foo 
     end
   end
 
   context ">= (try)" do
     it "try (>=) catches errors and wraps them as Failure" do
+      pending "not implemented"
       def error(ctx)
         raise "error #{ctx}"
       end
