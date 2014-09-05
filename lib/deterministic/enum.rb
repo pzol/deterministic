@@ -23,7 +23,7 @@ module Deterministic
       private
         def pretty_name
           self.class.name.split("::")[-1]
-        end        
+        end
       end
 
       module Nullary
@@ -89,7 +89,7 @@ module Deterministic
       end
 
       class << self
-        public :new; 
+        public :new;
       end
     end
 
@@ -115,14 +115,14 @@ module_function
 
         type_matches.each { |match|
           obj, type, block, args, guard = match
-          
+
           if args.count == 0
             return instance_exec(obj, &block)
           else
             raise Enum::MatchError, "Pattern (#{args.join(', ')}) must match (#{obj.args.join(', ')})" if args.count != obj.args.count
             context = exec_context(obj, args)
 
-            if guard 
+            if guard
               if context.instance_exec(obj, &guard)
                 return context.instance_exec(obj, &block)
               end
@@ -173,7 +173,7 @@ module_function
           type = Kernel.eval("#{mod.name}::#{m}")
 
           if args.count > 0 && args[-1].is_a?(Proc)
-            guard = args.delete_at(-1) 
+            guard = args.delete_at(-1)
           end
 
           @matches << [@obj, type, block, args, guard]

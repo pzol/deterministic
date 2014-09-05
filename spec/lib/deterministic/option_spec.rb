@@ -134,7 +134,7 @@ end
 
 # describe Deterministic::Option::None do
 #    it_behaves_like 'a Monad' do
-  
+
 #     let(:monad) { described_class }
 #   end
 # end

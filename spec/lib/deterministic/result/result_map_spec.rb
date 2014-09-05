@@ -15,8 +15,8 @@ describe Deterministic::Result do
 
         def call
           init >>
-            m(:validate) >> 
-            m(:send) >> 
+            m(:validate) >>
+            m(:send) >>
             m(:parse)
         end
 
@@ -137,7 +137,7 @@ describe Deterministic::Result do
       log = ->(n) { n.value + 1 }
       foo = ->(n) { Success(n + 1) }
 
-      actual = Success(1) << log >> foo 
+      actual = Success(1) << log >> foo
     end
   end
 

@@ -4,7 +4,7 @@ module Deterministic
     None()
   }
 
-  class Option  
+  class Option
     class << self
       def some?(expr)
         to_option(expr) { expr.nil? }
@@ -32,14 +32,14 @@ module Deterministic
         Some(s) { |m| m.class.new(fn.(s)) }
         None()  { |n| n }
       }
-    end 
+    end
 
     def map(&fn)
       match {
         Some(s) { |m| m.bind(&fn) }
         None()  { |n| n }
       }
-    end 
+    end
 
     def some?
       is_a? Option::Some
