@@ -109,6 +109,12 @@ describe List do
     specify { expect { Nil.new.foldl(0, &:+) }.to raise_error EmptyListError }
   end
 
+  it "find :: (a -> Bool) -> [a] -> Option a" do
+    list = Nil.new.append(21).append(15).append(9)
+    expect(list.find { |a| a == 15 }).to eq Deterministic::Option::Some.new(15)
+    expect(list.find { |a| a == 1 }).to eq Deterministic::Option::None.new
+  end
+
   context "reverse" do
     subject(:list) { Nil.new.append(21).append(15).append(9) }
     # specify { expect(list.reverse.first.head).to eq 21 }

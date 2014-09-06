@@ -61,9 +61,18 @@ Deterministic::impl(List) {
     }
   end
 
+  # The find function takes a predicate and a list and returns the first element in the list matching the predicate,
+  # or None if there is no such element.
+  def find(&pred)
+    match {
+      Nil() { Deterministic::Option::None.new }
+      Cons(h, t) { if pred.(h) then Deterministic::Option::Some.new(h) else t.find(&pred) end }
+    }
+  end
+
   def length
     match {
-      Cons(h, tail) { 1 + tail.length }
+      Cons(h, t) { 1 + t.length }
       Nil() { 0 }
     }
   end
