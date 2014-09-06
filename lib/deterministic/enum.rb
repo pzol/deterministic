@@ -170,6 +170,7 @@ module_function
 
       type_variants.each { |m|
         define_method(m) { |*args, &block|
+          raise ArgumentError, "No block given to `#{m}`" if block.nil?
           type = Kernel.eval("#{mod.name}::#{m}")
 
           if args.count > 0 && args[-1].is_a?(Proc)

@@ -88,6 +88,18 @@ describe Deterministic::Enum  do
         }
 
       expect(res).to eq [1, 2]
+
+      expect { b.match {
+        Nullary               # Nullary is treated as a constant
+      }
+      }.to raise_error(NameError)
+
+      expect { b.match {
+        Nullary()
+        Unary()
+        Binary()
+      }
+      }.to raise_error ArgumentError, "No block given to `Nullary`"
     end
   end
 end
