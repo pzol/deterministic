@@ -3,12 +3,14 @@ require 'spec_helper'
 module Deterministic
   class ProtocolBuilder
 
-    def initialize(generic, block)
-      @generic, @block = generic, block
+    def initialize(typevar, block)
+      @typevar, @block = typevar, block
+      @protocol = Class.new
     end
 
     def build
       instance_exec(&@block)
+      @protocol
     end
 
     def method_missing(m, *args)
@@ -19,8 +21,25 @@ module Deterministic
       p [:type, m]
     end
 
-    def fn(signature)
-      p [:fn, signature]
+    def fn(signature, &block)
+      m = signature.to_a.flatten
+      name        = m[0]
+      return_type = m[-1]
+      args        = m[1..-2]
+      p [:fn, name, args, return_type, block]
+      # m, args = signature
+      @protocol.instance_eval {
+
+        if block
+          define_method(name) { |*args|
+            result = block.call
+          }
+        else
+          define_method(name) {
+            raise NotImplementedError, "`#{name}` has no default implementation"
+          }
+        end
+      }
     end
   end
 
@@ -39,26 +58,50 @@ module Deterministic
   end
 
 module_function
-  def protocol(generic, &block)
-    ProtocolBuilder.new(generic, block).build
+  def protocol(typevar, &block)
+    ProtocolBuilder.new(typevar, block).build
   end
 
   def instance(protocol, type, &block)
     InstanceBuilder.new(protocol, type, block).build
   end
+
+  module Protocol
+    def const_missing(c)
+      p [:c, c]
+      c
+    end
+  end
 end
 
 include Deterministic
 
-Monoid = protocol(:M) {
-  fn(empty() => :M)
-  fn(append(a: :M, b: :M) => :M) {
-    a + b
-  }
-}
+module Haskelly
+  extend Deterministic::Protocol
 
-instance(Monoid, Fixnum) {
-  fn(empty() => Fixnum) {
-    [0]
+  Monoid = protocol(M) {
+    fn empty() => M
+    fn(append(a, b) => M) { |a, b|
+      a + b
+    }
   }
-}
+
+  Int = instance(Monoid, Fixnum) {
+    fn empty() => M {
+      0
+    }
+
+    fn append(a, b) => M {
+      a + b
+    }
+  }
+end
+
+describe Haskelly::Monoid do
+  it "does something" do
+    monoid = described_class.new
+    p [:monoid, monoid.methods]
+    expect { monoid.empty }.to raise_error(NotImplementedError)
+    expect(monoid.append(1, 2)).to eq 3
+  end
+end
