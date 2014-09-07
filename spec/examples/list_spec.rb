@@ -46,6 +46,11 @@ describe List do
     end
   end
 
+
+  it "from_a" do
+    expect(List[9, 15, 21].to_s).to eq "21, 15, 9, Nil"
+  end
+
   context "head" do
     specify { expect(list.head).to eq 1 }
   end
@@ -77,7 +82,7 @@ describe List do
   end
 
   context "filter" do
-    subject(:list) { Nil.new.append(21).append(15).append(9).append(3) }
+    subject(:list) { List[21, 15, 9, 3] }
     specify { expect(list.filter { |n| n < 10 }.to_s).to eq "3, 9, Nil" }
     specify { expect(Nil.new.filter { |n| n < 10 }).to eq Nil.new }
   end
@@ -89,7 +94,7 @@ describe List do
   end
 
   context "first & last" do
-    subject(:list) { Nil.new.append(21).append(15).append(9) }
+    subject(:list) { List[21, 15, 9] }
     specify { expect(list.first.head).to eq 9 }
     specify { expect(list.last.head).to eq 21 }
 
@@ -98,32 +103,40 @@ describe List do
   end
 
   context "init" do
-    subject(:list) { Nil.new.append(21).append(15).append(9) }
+    subject(:list) { List[21, 15, 9] }
     specify { expect(list.init.to_s).to eq "9, 15, Nil" }
     specify { expect { Nil.new.init}.to raise_error EmptyListError }
   end
 
-  context "foldl" do
-    subject(:list) { Nil.new.append(21).append(15).append(9) }
-    specify { expect(list.sum).to eq 45 }
-    specify { expect { Nil.new.foldl(0, &:+) }.to raise_error EmptyListError }
+  it "foldl :: [a] -> b -> (b -> a -> b) -> b" do
+    list = List[9, 15, 21]
+    expect(list.foldl(0) { |b, a| a + b }).to eq (((0 + 21) + 15) + 9)
+    expect(list.foldl(0) { |b, a| b - a }).to eq (((0 - 21) - 15) - 9)
+    expect(Nil.new.foldl(0, &:+)).to eq 0
   end
 
-  it "find :: (a -> Bool) -> [a] -> Option a" do
+  it "foldr :: [a] -> b -> (b -> a -> b) -> b" do
+    list = List[9, 15, 21]
+    expect(list.foldr(0) { |b, a| a + b }).to eq (21 + (15 + (9 + 0)))
+    expect(list.foldr(0) { |b, a| b - a }).to eq (21 - (15 - (9 - 0)))
+    expect(Nil.new.foldr(0, &:+)).to eq 0
+  end
+
+  it "find :: [a] -> (a -> Bool) -> Option a" do
     list = Nil.new.append(21).append(15).append(9)
     expect(list.find { |a| a == 15 }).to eq Deterministic::Option::Some.new(15)
-    expect(list.find { |a| a == 1 }).to eq Deterministic::Option::None.new
+    expect(list.find { |a| a == 1 }).to  eq Deterministic::Option::None.new
   end
 
   context "reverse" do
-    subject(:list) { Nil.new.append(21).append(15).append(9) }
-    # specify { expect(list.reverse.first.head).to eq 21 }
+    subject(:list) { List[21, 15, 9] }
+    specify { expect(list.reverse.first.head).to eq 21 }
     specify { expect(list.to_s).to eq "9, 15, 21, Nil" }
     specify { expect(list.reverse.to_s).to eq "21, 15, 9, Nil" }
   end
 
   context "to_a" do
-    subject(:list) { Nil.new.append(21).append(15).append(9) }
+    subject(:list) { List[21, 15, 9] }
     specify { expect(list.to_a).to eq [21, 15, 9] }
   end
 

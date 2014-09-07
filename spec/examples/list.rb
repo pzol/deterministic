@@ -5,6 +5,12 @@ List = Deterministic::enum {
   Nil()
 }
 
+class List
+  def self.[](*ary)
+    ary.inject(Nil.new) { |xs, x| xs.append(x) }
+  end
+end
+
 Deterministic::impl(List) {
   class EmptyListError < StandardError; end
 
@@ -90,9 +96,17 @@ Deterministic::impl(List) {
 
   def foldl(start, &fn)
     match {
-      Cons(h, t, where { t.null? }) { fn.(h, start) }
-      Cons(h, t) { fn.(h, t.foldl(start, &fn)) }
-      Nil() { |n| raise EmptyListError }
+      Nil() { start }
+      # foldl f z (x:xs) = foldl f (f z x) xs
+      Cons(h, t) { t.foldl(fn.(start, h), &fn) }
+    }
+  end
+
+  def foldr(start, &fn)
+    match {
+      Nil() { start }
+      # foldr f z (x:xs) = f x (foldr f z xs)
+      Cons(h, t) { fn.(h, t.foldr(start, &fn)) }
     }
   end
 
@@ -113,7 +127,7 @@ Deterministic::impl(List) {
   end
 
   def to_a
-    foldl([]) { |x, ary| ary << x }
+    foldr([]) { |x, ary| p [:ary, ary, x]; ary << x }
   end
 
   def any?(&pred)
