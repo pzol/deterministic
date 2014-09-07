@@ -7,7 +7,7 @@ List = Deterministic::enum {
 
 class List
   def self.[](*ary)
-    ary.inject(Nil.new) { |xs, x| xs.append(x) }
+    ary.reverse.inject(Nil.new) { |xs, x| xs.append(x) }
   end
 end
 
@@ -102,11 +102,27 @@ Deterministic::impl(List) {
     }
   end
 
+  def foldl1(&fn)
+    match {
+      Nil() { raise EmptyListError }
+      Cons(h, t) { t.foldl(h, &fn)}
+    }
+  end
+
   def foldr(start, &fn)
     match {
       Nil() { start }
       # foldr f z (x:xs) = f x (foldr f z xs)
       Cons(h, t) { fn.(h, t.foldr(start, &fn)) }
+    }
+  end
+
+  def foldr1(&fn)
+    match {
+      Nil() { raise EmptyListError }
+      Cons(h, t, where { t.null? }) { h }
+      # foldr1 f (x:xs) =  f x (foldr1 f xs)
+      Cons(h, t) { fn.(h, t.foldr1(&fn)) }
     }
   end
 
