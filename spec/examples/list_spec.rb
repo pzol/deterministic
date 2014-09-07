@@ -5,7 +5,7 @@ describe List do
   Nil  = List::Nil
   Cons = List::Cons
 
-  subject(:list) { Nil.new.append(1) }
+  subject(:list) { List[1] }
 
   specify { expect(list).to eq Cons.new(1, Nil.new) }
 
@@ -51,22 +51,26 @@ describe List do
     expect(List[9, 15, 21].to_s).to eq "21, 15, 9, Nil"
   end
 
+  it "append" do
+    expect(List[1].append(2)).to eq Cons.new(2, Cons.new(1, Nil.new))
+  end
+
   context "head" do
     specify { expect(list.head).to eq 1 }
   end
 
   context "tail" do
-    subject(:list) { Nil.new.append(21).append(15).append(9).append(3) }
+    subject(:list) { List[21, 15, 9, 3] }
     specify { expect(list.tail.to_s).to eq "9, 15, 21, Nil" }
   end
 
   context "take" do
-    subject(:list) { Nil.new.append(21).append(15).append(9).append(3) }
+    subject(:list) { List[21, 15, 9, 3] }
     specify { expect(list.take(2).to_s).to eq "3, 9, Nil" }
   end
 
   context "drop" do
-    subject(:list) { Nil.new.append(21).append(15).append(9).append(3) }
+    subject(:list) { List[21, 15, 9, 3] }
     specify { expect(list.drop(2).to_s).to eq "15, 21, Nil" }
   end
 
@@ -76,7 +80,7 @@ describe List do
   end
 
   context "length" do
-    subject(:list) { Nil.new.append(21).append(15).append(9).append(3) }
+    subject(:list) { List[21, 15, 9, 3] }
     specify { expect(list.length).to eq 4 }
     specify { expect(Nil.new.length).to eq 0 }
   end
@@ -88,7 +92,7 @@ describe List do
   end
 
   context "map" do
-    subject(:list) { Nil.new.append(1).append(2).append(3).append(4) }
+    subject(:list) { List[1, 2, 3, 4] }
 
     specify { expect(list.map { |h, t| h + 1 }).to eq Cons.new(5, Cons.new(4, Cons.new(3, Cons.new(2, Nil.new)))) }
   end
@@ -123,7 +127,7 @@ describe List do
   end
 
   it "find :: [a] -> (a -> Bool) -> Option a" do
-    list = Nil.new.append(21).append(15).append(9)
+    list = List[21, 15, 9]
     expect(list.find { |a| a == 15 }).to eq Deterministic::Option::Some.new(15)
     expect(list.find { |a| a == 1 }).to  eq Deterministic::Option::None.new
   end
@@ -141,24 +145,24 @@ describe List do
   end
 
   context "all?" do
-    subject(:list) { Nil.new.append(21).append(15).append(9) }
+    subject(:list) { List[21, 15, 9] }
     specify { expect(list.all? { |n| n.is_a?(Fixnum) }).to be_truthy }
   end
 
   context "any?" do
-    subject(:list) { Nil.new.append(21).append(15).append(9) }
+    subject(:list) { List[21, 15, 9] }
     specify { expect(list.any? { |n| n == 11 }).to be_falsey }
     specify { expect(list.any? { |n| n == 15 }).to be_truthy }
   end
 
   it "inspect" do
-    list = Nil.new.append(21).append(15).append(9)
+    list = List[21, 15, 9]
     expect(list.inspect).to eq "Cons(head: 9, tail: Cons(head: 15, tail: Cons(head: 21, tail: Nil)))"
     expect(Nil.new.inspect).to eq "Nil"
   end
 
   it "to_s" do
-    list = Nil.new.append(21).append(15).append(9)
+    list = List[21, 15, 9]
     expect(list.to_s).to eq "9, 15, 21, Nil"
     expect(Nil.new.to_s).to eq "Nil"
   end

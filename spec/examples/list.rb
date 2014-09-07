@@ -127,7 +127,7 @@ Deterministic::impl(List) {
   end
 
   def to_a
-    foldr([]) { |x, ary| p [:ary, ary, x]; ary << x }
+    foldr([]) { |x, ary| ary << x }
   end
 
   def any?(&pred)
