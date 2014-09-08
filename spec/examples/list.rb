@@ -9,6 +9,10 @@ class List
   def self.[](*ary)
     ary.reverse.inject(Nil.new) { |xs, x| xs.append(x) }
   end
+
+  def self.empty
+    @empty ||= Nil.new
+  end
 end
 
 Deterministic::impl(List) {

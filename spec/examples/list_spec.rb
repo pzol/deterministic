@@ -46,6 +46,9 @@ describe List do
     end
   end
 
+  it "empty" do
+    expect(List.empty.object_id).to eq List.empty.object_id
+  end
 
   it "from_a" do
     expect(List[21, 15, 9].to_s).to eq "21, 15, 9, Nil"
