@@ -74,6 +74,12 @@ describe Deterministic::Option do
   specify { expect(None + None + Some(1) + None).to eq Some(1) }
   specify { expect { Some([1]) + Some(1)}.to raise_error TypeError}
 
+  # join
+  specify{ expect(Some(Success(1))).to eq(Some(1))}
+  specify{ expect(Some(None)).to eq(Some(nil))}
+  specify{ expect(Some(Failure(1))).to eq(Some(1))}
+
+
   # match
   specify {
     expect(
