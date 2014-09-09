@@ -61,8 +61,8 @@ module Deterministic
       match {
         Success(s, where { other.success?} ) { Result::Success.new(s + other.value) }
         Failure(f, where { other.failure?} ) { Result::Failure.new(f + other.value) }
-        Success(s) { other } # implied other.failure?
-        Failure(_) { |f| f }   # implied other.success?
+        Success(_) { other } # implied other.failure?
+        Failure(_) { |f| f } # implied other.success?
       }
     end
   }
