@@ -10,7 +10,8 @@ module Deterministic
     # If the passed value is monad already, get the value to avoid nesting
     # M[M[A]] is equivalent to M[A]
     def join(value)
-      if value.class.include? Monad then value.value
+      parent = self.class.superclass === Object ? self.class : self.class.superclass
+      if value.is_a?(parent) && value.class != Option::None then value.value
       else value end
     end
 

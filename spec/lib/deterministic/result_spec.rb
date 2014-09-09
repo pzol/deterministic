@@ -9,13 +9,13 @@ end
 
 describe Deterministic::Result do
   include Deterministic
+  Some = Deterministic::Some
+  None = Deterministic::None
 
   specify{ expect(Success(Success(1))).to eq(Success(1)) }
   specify{ expect(Failure(Failure(1))).to eq(Failure(1)) }
   specify{ expect(Success(Failure(1))).to eq(Success(1)) }
   specify{ expect(Failure(Success(1))).to eq(Failure(1)) }
-  specify{ expect(Success(Some(1))).to eq(Success(1))}
-  specify{ expect(Failure(Deterministic::None)).to eq(Failure(nil))}
-  specify{ expect(Some(Success(1))).to eq(Some(1))}
-  specify{ expect(Some(Deterministic::None)).to eq(Some(nil))}
+  specify{ expect(Success(Some(1))).to eq(Success(Some(1)))}
+  specify{ expect(Failure(None)).to eq(Failure(None))}
 end
