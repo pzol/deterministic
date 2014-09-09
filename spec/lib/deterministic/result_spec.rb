@@ -18,6 +18,15 @@ describe Deterministic::Result do
     expect(Failure(0).map { |n| Success(n + 1)}).to eq Failure(0)
   end
 
+  it "+" do
+    expect(Success([1]) + Failure([2])).to eq Failure([2])
+    expect(Success(1) + Success(1)).to eq Success(2)
+    expect(Failure(2) + Success(1)).to eq Failure(2)
+    expect(Failure([2]) + Failure([3]) + Success(1)).to eq Failure([2, 3])
+    expect(Success([1]) + Success([1])).to eq Success([1, 1])
+    expect { Success([1]) + Success(1)}.to raise_error TypeError
+  end
+
   subject { Success(1) }
   # specify { expect(subject).to be_an_instance_of described_class }
   specify { expect(subject).to be_success }

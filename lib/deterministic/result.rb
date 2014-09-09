@@ -41,7 +41,7 @@ module Deterministic
     end
 
     def or(other)
-      raise Deterministic::Monad::NotMonadError, "Expected #{other.inspect} to be an Result" unless other.is_a? Result
+      raise Deterministic::Monad::NotMonadError, "Expected #{other.inspect} to be a Result" unless other.is_a? Result
       match {
         Success(_) { |s| s }
         Failure(_) { other}
@@ -49,10 +49,20 @@ module Deterministic
     end
 
     def and(other)
-      raise Deterministic::Monad::NotMonadError, "Expected #{other.inspect} to be an Result" unless other.is_a? Result
+      raise Deterministic::Monad::NotMonadError, "Expected #{other.inspect} to be a Result" unless other.is_a? Result
       match {
         Success(_) { other }
         Failure(_) { |f| f }
+      }
+    end
+
+    def +(other)
+      raise Deterministic::Monad::NotMonadError, "Expected #{other.inspect} to be a Result" unless other.is_a? Result
+      match {
+        Success(s, where { other.success?} ) { Result::Success.new(s + other.value) }
+        Failure(f, where { other.failure?} ) { Result::Failure.new(f + other.value) }
+        Success(s) { other } # implied other.failure?
+        Failure(_) { |f| f }   # implied other.success?
       }
     end
   }
