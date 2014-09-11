@@ -1,3 +1,10 @@
+## v0.14.0
+
+- Add `Result#+`
+- Alias pipe with << for left association
+- Make the None convenience wrapper always return instance
+- Add global convenience typdef for Success, Failure
+
 ## v0.13.0
 
 - Add `Option#value_to_a`
