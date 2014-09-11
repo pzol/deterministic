@@ -50,7 +50,7 @@ module Deterministic
       other
     end
 
-    # `or(self: Failure(a), other: Result(b)) -> Result(b)` 
+    # `or(self: Failure(a), other: Result(b)) -> Result(b)`
     # Replaces `Failure a` with `Result`. If a `Failure` is passed as argument, it is ignored.
     def or(other)
       return self if success?
@@ -85,18 +85,30 @@ module Deterministic
       Result::Failure.new(err)
     end
 
+    # `+(self: Result(a), other: Result(a)) -> Result(a -> a)`
+    # Add the inner values of two Result
+    def +(other)
+      raise Deterministic::Monad::NotMonadError, "Expected #{other.inspect} to be an Result" unless other.is_a? Result
+      match {
+        success -> (_) { other.success? } { |s| Result::Success.new(s + other.value)}
+        failure -> (_) { other.failure? } { |f| Result::Failure.new(f + other.value)}
+        success { other } # implied other.failure?
+        failure { self }   # implied other.success?
+      }
+    end
+
     alias :>= :try
-    
+
     class Failure < Result
       class << self; public :new; end
     end
-    
+
     class Success < Result
       class << self; public :new; end
     end
   end
 
-module_function
+  module_function
   def Success(value)
     Result::Success.new(value)
   end
