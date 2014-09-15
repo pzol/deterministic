@@ -34,10 +34,6 @@ module Deterministic
           define_method(name) { |*args|
             block.call(args)
           }
-        # else
-        #   define_method(name) {
-        #     raise NotImplementedError, "`#{name}` has no default implementation"
-        #   }
         end
       }
     end
