@@ -183,6 +183,14 @@ module_function
     }
 
     mod.const_set(:Matcher, matcher)
+
+    type_variants.each { |variant|
+      mod.singleton_class.class_exec {
+        define_method(variant) { |*args|
+          const_get(variant).new(*args)
+        }
+      }
+    }
     mod
   end
 

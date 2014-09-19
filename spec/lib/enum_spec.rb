@@ -22,7 +22,7 @@ describe Deterministic::Enum  do
     end
 
     it "Nullary" do
-      n = MyEnym::Nullary.new
+      n = MyEnym.Nullary
 
       expect(n).to be_a MyEnym
       expect(n).to be_a MyEnym::Nullary
@@ -33,7 +33,7 @@ describe Deterministic::Enum  do
     end
 
     it "Unary" do
-      u = MyEnym::Unary.new(1)
+      u = MyEnym::Unary(1)
 
       expect(u).to be_a MyEnym
       expect(u).to be_a MyEnym::Unary
@@ -45,7 +45,7 @@ describe Deterministic::Enum  do
 
     it "Binary" do
       # hash
-      b = MyEnym::Binary.new(a: 1, b: 2)
+      b = MyEnym::Binary(a: 1, b: 2)
       expect(b).to be_a MyEnym
       expect(b).to be_a MyEnym::Binary
       expect(b.inspect).to eq "Binary(a: 1, b: 2)"
@@ -55,21 +55,21 @@ describe Deterministic::Enum  do
       expect(b.value).to eq({a: 1, b: 2})
 
       # values only
-      b = MyEnym::Binary.new(1, 2)
+      b = MyEnym::Binary(1, 2)
       expect(b.value).to eq({a: 1, b: 2})
 
       # other names are ok
-      b = MyEnym::Binary.new(c: 1, d: 2)
+      b = MyEnym::Binary(c: 1, d: 2)
       expect(b.value).to eq({a: 1, b: 2})
 
-      expect { MyEnym::Binary.new(1) }.to raise_error ArgumentError
+      expect { MyEnym::Binary(1) }.to raise_error ArgumentError
     end
 
     it "generated enum" do
       expect(MyEnym.variants).to eq [:Nullary, :Unary, :Binary]
       expect(MyEnym.constants.inspect).to eq "[:Nullary, :Unary, :Binary, :Matcher]"
 
-      b = MyEnym::Binary.new(a: 1, b: 2)
+      b = MyEnym::Binary(a: 1, b: 2)
 
       res =
         MyEnym.match(b) {
