@@ -90,8 +90,8 @@ module Deterministic
     def +(other)
       raise Deterministic::Monad::NotMonadError, "Expected #{other.inspect} to be an Result" unless other.is_a? Result
       match {
-        success -> (_) { other.success? } { |s| Result::Success.new(s + other.value)}
-        failure -> (_) { other.failure? } { |f| Result::Failure.new(f + other.value)}
+        success ->(_) { other.success? } { |s| Result::Success.new(s + other.value)}
+        failure ->(_) { other.failure? } { |f| Result::Failure.new(f + other.value)}
         success { other } # implied other.failure?
         failure { self }   # implied other.success?
       }
