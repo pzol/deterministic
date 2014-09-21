@@ -2,9 +2,8 @@ require 'spec_helper'
 require_relative '../monad_axioms'
 require_relative 'result_shared'
 
-include Deterministic
-
 describe Deterministic::Result::Success do
+  include Deterministic::Prelude::Result
 
   it_behaves_like 'a Monad' do
     let(:monad) { described_class }

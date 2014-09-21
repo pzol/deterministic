@@ -1,8 +1,9 @@
 require 'spec_helper'
 
-include Deterministic
-
 describe Deterministic::Either do
+  include Deterministic
+  Either = Deterministic::Either
+
   it "+ does not change operands" do
     l = Left(1)
     r = Right(2)

@@ -4,12 +4,11 @@ module Deterministic
   end
 
   class EnumBuilder
-    def initialize(mod)
-      @mod = mod
+    def initialize(parent)
+      @parent = parent
     end
 
     class DataType
-
       module AnyEnum
         include Deterministic::Monad
 
@@ -17,96 +16,70 @@ module Deterministic
           parent.match(self, &block)
         end
 
-        def parent
-          eval(self.class.name.split("::")[-2])
-        end
-
         def to_s
           value.to_s
         end
 
-        def inner_value
-          @value
-        end
-
-      private
-        def pretty_name
+        def name
           self.class.name.split("::")[-1]
-        end        
+        end
       end
 
       module Nullary
         def initialize(*args)
-          @value = []
-        end
-
-        def to_s
-          ""
-        end
-
-        def value
-          @value
+          @value = nil
         end
 
         def inspect
-            pretty_name
-        end
-      end
-
-      module Unary
-        def initialize(arg)
-          @value = [arg]
-        end
-
-        def value
-          @value[0]
-        end
-
-        def inspect
-          "#{pretty_name}(#{value})"
+          name
         end
       end
 
       module Binary
-        def initialize(*args)
-          @value = args
+        def initialize(*init)
+          raise ArgumentError, "Expected arguments for #{args}, got #{init}" unless (init.count == 1 && init[0].is_a?(Hash)) || init.count == args.count
+          if init.count == 1 && init[0].is_a?(Hash)
+            @value = Hash[args.zip(init[0].values)]
+          else
+            @value = Hash[args.zip(init)]
+          end
         end
 
-        attr_reader :value
-
         def inspect
-          params = args.zip(@value).map { |e| "#{e[0]}: #{e[1].inspect}" }
-          "#{pretty_name}(#{params.join(", ")})"
+          params = value.map { |k, v| "#{k}: #{v.inspect}" }
+          "#{name}(#{params.join(', ')})"
         end
       end
 
-      def self.create(name, args)
-        dt = Class.new
+      def self.create(parent, name, args)
+        raise ArgumentError, "#{args} may not contain the reserved name :value" if args.include? :value
+        dt = Class.new(parent)
+
+        dt.instance_eval {
+          class << self; public :new; end
+          include AnyEnum
+          define_method(:args) { args }
+
+          define_method(:parent) { parent }
+          private :parent
+        }
 
         if args.count == 0
           dt.instance_eval {
-            include AnyEnum
             include Nullary
             private :value
           }
         elsif args.count == 1
           dt.instance_eval {
-            include AnyEnum
-            include Unary
-
             define_method(args[0].to_sym) { value }
-            define_method(:args) { args }
           }
         else
           dt.instance_eval {
-            include AnyEnum
             include Binary
 
-            define_method(:args) { args }
-
-            args.each_with_index do |m, i|
+            args.each do |m|
               define_method(m) do
-                @value[i]
+                @value[m]
               end
             end
           }
@@ -115,26 +88,20 @@ module Deterministic
       end
 
       class << self
-        public :new; 
-      end
-
-      def initialize(*args)
-        @value = None
-      end
-
-      def self.inspect 
-        "Deterministic::Enum::Empty"
+        public :new;
       end
     end
 
     def method_missing(m, *args)
-      @mod.const_set(m, DataType.create(m, args))
+      @parent.const_set(m, DataType.create(@parent, m, args))
     end
   end
 
 module_function
   def enum(&block)
     mod = Class.new do # the enum to be built
+      class << self; private :new; end
+
       def self.match(obj, &block)
         matcher = self::Matcher.new(obj)
         matcher.instance_eval(&block)
@@ -147,14 +114,14 @@ module_function
 
         type_matches.each { |match|
           obj, type, block, args, guard = match
-          
+
           if args.count == 0
             return instance_exec(obj, &block)
           else
             raise Enum::MatchError, "Pattern (#{args.join(', ')}) must match (#{obj.args.join(', ')})" if args.count != obj.args.count
             context = exec_context(obj, args)
 
-            if guard 
+            if guard
               if context.instance_exec(obj, &guard)
                 return context.instance_exec(obj, &block)
               end
@@ -171,7 +138,11 @@ module_function
 
       private
       def self.exec_context(obj, args)
-        Struct.new(*(args + [:this])).new(*(obj.inner_value + [obj]))
+        if obj.is_a?(Deterministic::EnumBuilder::DataType::Binary)
+          Struct.new(*(args)).new(*(obj.value.values))
+        else
+          Struct.new(*(args)).new(obj.value)
+        end
       end
     end
     enum = EnumBuilder.new(mod)
@@ -198,10 +169,11 @@ module_function
 
       type_variants.each { |m|
         define_method(m) { |*args, &block|
+          raise ArgumentError, "No block given to `#{m}`" if block.nil?
           type = Kernel.eval("#{mod.name}::#{m}")
 
           if args.count > 0 && args[-1].is_a?(Proc)
-            guard = args.delete_at(-1) 
+            guard = args.delete_at(-1)
           end
 
           @matches << [@obj, type, block, args, guard]
@@ -210,6 +182,14 @@ module_function
     }
 
     mod.const_set(:Matcher, matcher)
+
+    type_variants.each { |variant|
+      mod.singleton_class.class_exec {
+        define_method(variant) { |*args|
+          const_get(variant).new(*args)
+        }
+      }
+    }
     mod
   end
 

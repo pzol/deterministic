@@ -17,7 +17,7 @@ class Logger
     def validate(item)
       return Failure(["Item cannot be empty"]) if item.blank?
       return Failure(["Item must be a Hash"]) unless item.is_a?(Hash)
- 
+
       validate_required_params(item).match {
          none { Success(item) }
          some { |errors| Failure(errors) }
@@ -85,14 +85,14 @@ class Ensure
 end
 
 class Validator < Ensure
-  
+
   def date_is_one!
     value[:date] == 1 ? None : Some({actual: value[:date], expected: 1})
   end
 
   def required_params!
     params = %w(date tenant contract user facility short data)
-    params.inject(None) { |errors, param| 
+    params.inject(None) { |errors, param|
       errors + (value[:param].nil? || value[:param].empty? ? Some([param]) : None)
     }
   end
@@ -106,7 +106,7 @@ end
 describe Ensure do
   None = Deterministic::Option::None.new
   Some = Deterministic::Option::Some
-  
+
   it "Ensure" do
     params = {date: 2}
 

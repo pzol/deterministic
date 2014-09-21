@@ -5,6 +5,16 @@ List = Deterministic::enum {
   Nil()
 }
 
+class List
+  def self.[](*ary)
+    ary.reverse.inject(Nil.new) { |xs, x| xs.append(x) }
+  end
+
+  def self.empty
+    @empty ||= Nil.new
+  end
+end
+
 Deterministic::impl(List) {
   class EmptyListError < StandardError; end
 
@@ -61,9 +71,18 @@ Deterministic::impl(List) {
     }
   end
 
+  # The find function takes a predicate and a list and returns the first element in the list matching the predicate,
+  # or None if there is no such element.
+  def find(&pred)
+    match {
+      Nil() { Deterministic::Option::None.new }
+      Cons(h, t) { if pred.(h) then Deterministic::Option::Some.new(h) else t.find(&pred) end }
+    }
+  end
+
   def length
     match {
-      Cons(h, tail) { 1 + tail.length }
+      Cons(h, t) { 1 + t.length }
       Nil() { 0 }
     }
   end
@@ -81,9 +100,33 @@ Deterministic::impl(List) {
 
   def foldl(start, &fn)
     match {
-      Cons(h, t, where { t.null? }) { fn.(h, start) }
-      Cons(h, t) { fn.(h, t.foldl(start, &fn)) }
-      Nil() { |n| raise EmptyListError }
+      Nil() { start }
+      # foldl f z (x:xs) = foldl f (f z x) xs
+      Cons(h, t) { t.foldl(fn.(start, h), &fn) }
+    }
+  end
+
+  def foldl1(&fn)
+    match {
+      Nil() { raise EmptyListError }
+      Cons(h, t) { t.foldl(h, &fn)}
+    }
+  end
+
+  def foldr(start, &fn)
+    match {
+      Nil() { start }
+      # foldr f z (x:xs) = f x (foldr f z xs)
+      Cons(h, t) { fn.(h, t.foldr(start, &fn)) }
+    }
+  end
+
+  def foldr1(&fn)
+    match {
+      Nil() { raise EmptyListError }
+      Cons(h, t, where { t.null? }) { h }
+      # foldr1 f (x:xs) =  f x (foldr1 f xs)
+      Cons(h, t) { fn.(h, t.foldr1(&fn)) }
     }
   end
 
@@ -104,7 +147,7 @@ Deterministic::impl(List) {
   end
 
   def to_a
-    foldl([]) { |x, ary| ary << x }
+    foldr([]) { |x, ary| ary << x }
   end
 
   def any?(&pred)

@@ -1,12 +1,10 @@
-require 'deterministic/enum'
-
 module Deterministic
   Option = Deterministic::enum {
     Some(:s)
     None()
   }
 
-  class Option  
+  class Option
     class << self
       def some?(expr)
         to_option(expr) { expr.nil? }
@@ -34,14 +32,14 @@ module Deterministic
         Some(s) { |m| m.class.new(fn.(s)) }
         None()  { |n| n }
       }
-    end 
+    end
 
     def map(&fn)
       match {
         Some(s) { |m| m.bind(&fn) }
         None()  { |n| n }
       }
-    end 
+    end
 
     def some?
       is_a? Option::Some
@@ -65,9 +63,18 @@ module Deterministic
     def +(other)
       match {
         None() { other }
+        Some(_, where { !other.is_a?(Option)}) { raise TypeError, "Other must be an #{Option}"}
         Some(s, where { other.some? }) { Option::Some.new(s + other.value) }
         Some(_) { |s| s }
       }
     end
   }
+
+  module Prelude
+    module Option
+      None = Deterministic::Option::None.new
+      def Some(s); Deterministic::Option::Some.new(s); end
+      def None(); Deterministic::Prelude::Option::None; end
+    end
+  end
 end
