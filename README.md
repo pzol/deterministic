@@ -390,6 +390,30 @@ Threenum::Unary(5).match {
 }                                      # => 5
 ```
 
+Implementing methods for enums
+
+```ruby
+Deterministic::impl(Threenum) {
+  def sum
+    match {
+      Nullary()    { 0 }
+      Unary(u)     { u }
+      Binary(a, b) { a + b }
+    }
+  end
+
+  def +(other)
+    match {
+      Nullary()    { other.sum }
+      Unary(a)     { |this| this.sum + other.sum }
+      Binary(a, b) { |this| this.sum + other.sum }
+    }
+  end
+}
+
+Threenum.Nullary + Threenum.Unary(1)   # => Unary(1)
+```
+
 All matches must be exhaustive, i.e. cover all variants
 
 ## Maybe
