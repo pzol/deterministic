@@ -2,7 +2,7 @@
 
 [![Gem Version](https://badge.fury.io/rb/deterministic.png)](http://badge.fury.io/rb/deterministic)
 
-Deterministic is to help your code to be more confident, it's specialty is flow control of actions that either succeed or fail.
+Deterministic is to help your code to be more confident, by utilizing functional programming patterns.
 
 This is a spiritual successor of the [Monadic gem](http://github.com/pzol/monadic). The goal of the rewrite is to get away from a bit to forceful aproach I took in Monadic, especially when it comes to coercing monads, but also a more practical but at the same time more strict adherence to monad laws.
 
@@ -29,6 +29,9 @@ Deterministic provides different monads, here is a short guide, when to use whic
 
 #### Maybe
 - an object may be nil, you want to avoid endless nil? checks
+
+#### Enums (Algebraic Data Types)
+- roll your own pattern
 
 ## Usage
 
@@ -103,12 +106,6 @@ Failure(1).or_else { |n| Success(n)}   # => Success(1)
 
 Executes the block passed, but completely ignores its result. If an error is raised within the block it will **NOT** be catched.
 
-```ruby
-Success(1).try { |n| log(n.value) }    # => Success(1)
-```
-
-The value or block result must always be a `Result` i.e. `Success` or `Failure`.
-
 ### Result Chaining
 
 You can easily chain the execution of several operations. Here we got some nice function composition.  
@@ -118,14 +115,17 @@ The following aliases are defined
 
 ```ruby
 alias :>> :map
-alias :>= :try
-alias :** :pipe       # the operator must be right associative
+alias :<< :pipe
 ```
 
 This allows the composition of procs or lambdas and thus allow a clear definiton of a pipeline.
 
 ```ruby
-Success(params) >> validate >> build_request ** log >> send ** log >> build_response
+Success(params) >>
+  validate >>
+  build_request << log >>
+  send << log >>
+  build_response
 ```
 
 #### Complex Example in a Builder Class
@@ -203,9 +203,8 @@ Now that you have some result, you want to control flow by providing patterns.
 
 ```ruby
 Success(1).match do
-  success { |v| "success #{v}"}
-  failure { |v| "failure #{v}"}
-  result  { |v| "result #{v}"}
+  Success(s) { |v| "success #{s}"}
+  Failure(f) { |v| "failure #{f}"}
 end # => "success 1"
 ```
 Note1: the inner value has been unwrapped! 
@@ -214,19 +213,11 @@ Note2: only the __first__ matching pattern block will be executed, so order __ca
 
 The result returned will be the result of the __first__ `#try` or `#let`. As a side note, `#try` is a monad, `#let` is a functor.
 
-Values for patterns are good, too:
+Guards
 
 ```ruby
 Success(1).match do
-  success(1) {|v| "Success #{v}" }
-end # => "Success 1"
-```
-
-You can and should also use procs for patterns:
-
-```ruby
-Success(1).match do
-  success ->(v) { v == 1 } {|v| "Success #{v}" }
+  Success(s, where { s == 1 }) { "Success #{s}" }
 end # => "Success 1"
 ```
 
@@ -234,7 +225,7 @@ Also you can match the result class
 
 ```ruby
 Success([1, 2, 3]).match do
-  success(Array) { |v| v.first }
+  Success(s, where { s.is_a?(Array)} ) { s.first }
 end # => 1
 ```
 
@@ -242,22 +233,14 @@ If no match was found a `NoMatchError` is raised, so make sure you always cover 
 
 ```ruby
 Success(1).match do
-  failure(1) { "you'll never get me" }
+  Failure(f) { "you'll never get me" }
 end # => NoMatchError
 ```
 
-A way to have a catch-all would be using an `any`:
-
-```ruby
-Success(1).match do
-  any { "catch-all" }
-end # => "catch-all"
-```
+Matches must be exhaustive, otherwise an error will be raised, showing the variants which have not been covered.
 
 ## core_ext
 You can use a core extension, to include Result in your own class or in Object, i.e. in all classes.
-
-
 
 ```ruby
 require 'deterministic/core_ext/object/result'
@@ -275,23 +258,35 @@ Some(1).some?                          # #=> true
 Some(1).none?                          # #=> false
 None.some?                             # #=> false
 None.none?                             # #=> true
+```
 
+Maps an `Option` with the value `a` to the same `Option` with the value `b`.
+
+```ruby
 Some(1).fmap { |n| n + 1 }             # => Some(2)
 None.fmap { |n| n + 1 }                # => None
+```
 
+Maps a `Result` with the value `a` to another `Result` with the value `b`.
+
+```ruby
 Some(1).map  { |n| Some(n + 1) }       # => Some(2)
 Some(1).map  { |n| None }              # => None
 None.map     { |n| Some(n + 1) }       # => None
+```
 
+Get the inner value or provide a default for a `None`. Calling `#value` on a `None` will raise a `NoMethodError`
+
+```ruby
 Some(1).value                          # => 1
 Some(1).value_or(2)                    # => 1
 None.value                             # => NoMethodError
 None.value_or(0)                       # => 0
+```
 
-Some(1).value_to_a                     # => Some([1])
-Some([1]).value_to_a                   # => Some([1])
-None.value_to_a                        # => None
+Add the inner values of option using `+`.
 
+```ruby
 Some(1) + Some(1)                      # => Some(2)
 Some([1]) + Some(1)                    # => TypeError: No implicit conversion
 None + Some(1)                         # => Some(1)
@@ -315,15 +310,87 @@ Option.try! { 1 }                      # => Some(1)
 Option.try! { raise "error"}           # => None
 ```
 
-### Pattern Matching 
+### Pattern Matching
 ```ruby
 Some(1).match {
-  some(1) { |n| n + 1 }
-  some    { 1 }
-  none    { 0 }
+  Some(s, where { s == 1 }) { s + 1 }
+  Some(s)                   { 1 }
+  None()                    { 0 }
 }                                      # => 2
 ```
 
+## Enums
+All the above are implemented using enums, see their definition, for more details.
+
+Define it, with all variants:
+
+```ruby
+Threenum = Deterministic::enum {
+            Nullary()
+            Unary(:a)
+            Binary(:a, :b)
+           }
+
+Threenum.variants                      # => [:Nullary, :Unary, :Binary]
+```
+
+Initialize
+
+```ruby
+n = Threenum.Nullary                   # => Threenum::Nullary.new()
+n.value                                # => Error
+
+u = Threenum.Unary(1)                  # => Threenum::Unary.new(1)
+u.value                                # => 1
+
+b = Threenum::Binary(2, 3)             # => Threenum::Binary(2, 3)
+b.value                                # => { a:2, b: 3 }
+```
+
+Pattern matching
+
+```ruby
+Threenum::Unary(5).match {
+  Nullary()     { 0 }
+  Unary(u)      { u }
+  Binary(a, b)  { a + b }
+}                                      # => 5
+
+# or
+t = Threenum::Unary(5)
+Threenum.match(t) {
+  Nullary()     { 0 }
+  Unary(u)      { u }
+  Binary(a, b)  { a + b }
+}                                      # => 5
+```
+
+If you want the whole thing use the arg passed to the block (second case)
+
+```ruby
+def drop(n)
+  match {
+    Cons(h, t, where { n > 0 }) { t.drop(n - 1) }
+    Cons(_, _) { |c| c }
+    Nil() { raise EmptyListError}
+  }
+end
+```
+
+See the linked list implementation in the specs for more examples
+
+With guard clauses
+
+```ruby
+Threenum::Unary(5).match {
+  Nullary()     { 0 }
+  Unary(u)      { u }
+  Binary(a, b, where { a.is_a?(Fixnum) && b.is_a?(Fixnum)})  { a + b }
+  Binary(a, b)  { raise "Expected a, b to be numbers" }
+}                                      # => 5
+```
+
+All matches must be exhaustive, i.e. cover all variants
 
 ## Maybe
 The simplest NullObject wrapper there can be. It adds `#some?` and `#null?` to `Object` though.
