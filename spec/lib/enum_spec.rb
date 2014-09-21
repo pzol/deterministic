@@ -26,6 +26,7 @@ describe Deterministic::Enum  do
 
       expect(n).to be_a MyEnym
       expect(n).to be_a MyEnym::Nullary
+      expect(n.name).to eq "Nullary"
       expect { n.value }.to raise_error
       expect(n.inspect).to eq "Nullary"
       expect(n.to_s).to eq ""
@@ -37,6 +38,7 @@ describe Deterministic::Enum  do
 
       expect(u).to be_a MyEnym
       expect(u).to be_a MyEnym::Unary
+      expect(u.name).to eq "Unary"
       expect(u.a).to eq 1
       expect(u.value).to eq 1
       expect(u.inspect).to eq "Unary(1)"
@@ -48,6 +50,7 @@ describe Deterministic::Enum  do
       b = MyEnym::Binary(a: 1, b: 2)
       expect(b).to be_a MyEnym
       expect(b).to be_a MyEnym::Binary
+      expect(b.name).to eq "Binary"
       expect(b.inspect).to eq "Binary(a: 1, b: 2)"
 
       expect(b.a).to eq 1

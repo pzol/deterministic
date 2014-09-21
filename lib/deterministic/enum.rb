@@ -20,8 +20,7 @@ module Deterministic
           value.to_s
         end
 
-      private
-        def pretty_name
+        def name
           self.class.name.split("::")[-1]
         end
       end
@@ -32,7 +31,7 @@ module Deterministic
         end
 
         def inspect
-          pretty_name
+          name
         end
       end
 
@@ -48,7 +47,7 @@ module Deterministic
 
         def inspect
           params = value.map { |k, v| "#{k}: #{v.inspect}" }
-          "#{pretty_name}(#{params.join(', ')})"
+          "#{name}(#{params.join(', ')})"
         end
       end
 
