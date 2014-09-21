@@ -1,3 +1,7 @@
+## v0.14.1
+
+- Make Ruby 1.9.3 compatible
+
 ## v0.14.0
 
 - Add `Result#+`
