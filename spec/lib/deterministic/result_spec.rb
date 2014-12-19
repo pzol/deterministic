@@ -49,4 +49,10 @@ describe Deterministic::Result do
   specify { expect(subject.and(Failure(2))).to eq Failure(2)}
   specify { expect(subject.and_then { Success(2) }).to eq Success(2)}
   specify { expect(subject.and_then { Failure(2) }).to eq Failure(2)}
+
+
+  it "try!" do
+    expect(described_class.try! { 1 }).to eq Success(1)
+    expect(described_class.try! { raise "error" }.inspect).to eq Failure(RuntimeError.new("error")).inspect
+  end
 end

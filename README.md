@@ -106,6 +106,15 @@ Failure(1).or_else { |n| Success(n)}   # => Success(1)
 
 Executes the block passed, but completely ignores its result. If an error is raised within the block it will **NOT** be catched.
 
+Try failable operations to return `Success` or `Failure`
+
+```ruby
+include Deterministic::Prelude::Result
+
+try! { 1 }                             # => Success(1)
+try! { raise "hell" }                  # => Failure(#<RuntimeError: hell>)
+```
+
 ### Result Chaining
 
 You can easily chain the execution of several operations. Here we got some nice function composition.  

@@ -1,9 +1,20 @@
-
 module Deterministic
   Result = Deterministic::enum {
     Success(:s)
     Failure(:f)
   }
+
+  class Result
+    class << self
+      def try!
+        begin
+          Success.new(yield)
+        rescue => err
+          Failure.new(err)
+        end
+      end
+    end
+  end
 
   Deterministic::impl(Result) {
     def map(proc=nil, &block)
@@ -71,6 +82,7 @@ end
 module Deterministic
   module Prelude
     module Result
+      def try!(&block); Deterministic::Result.try!(&block); end
       def Success(s); Deterministic::Result::Success.new(s); end
       def Failure(f); Deterministic::Result::Failure.new(f); end
     end
