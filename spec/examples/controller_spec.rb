@@ -22,7 +22,7 @@ class BookingController
   end
 
   def log(step)
-    ->(data) { p [step, data] }
+    ->(data) { [step, data] }
   end
 
   def ability(ctx)

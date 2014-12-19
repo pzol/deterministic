@@ -53,12 +53,10 @@ class Booking
   end
 
   def validate(id)
-    p [:validate, id]
     Success(id)
   end
 
   def req(a, id)
-    p [:req, a, id]
     Success(id: id + a)
   end
 
@@ -81,7 +79,6 @@ describe "Pref" do
     b = Booking.new(1)
     actual = b.validate(1) >> b.req(2) >> b.find >> b.render(:html)
 
-    p [:actual, actual]
     expected = Deterministic::Result::Success.new("rendered in html: {:id=>3}")
     expect(actual).to eq expected
   end
