@@ -117,6 +117,7 @@ describe Deterministic::Option do
     expect(described_class.any?({})).to  be_none
     expect(described_class.any?([1])).to eq Some([1])
     expect(described_class.any?({foo: 1})).to eq Some({foo: 1})
+    expect(described_class.any?(1)).to eq Some(1)
   end
 
   it "try!" do
