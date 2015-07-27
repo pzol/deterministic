@@ -143,7 +143,6 @@ describe Deterministic::Result do
 
   context ">= (try)" do
     it "try (>=) catches errors and wraps them as Failure" do
-      pending "not implemented"
       def error(ctx)
         raise "error #{ctx}"
       end

@@ -76,6 +76,15 @@ module Deterministic
         Failure(_) { |f| f } # implied other.success?
       }
     end
+
+    def try(proc=nil, &block)
+      map(proc, &block)
+    rescue => err
+      Result::Failure.new(err)
+    end
+
+    alias :>= :try
+
   }
 end
 
