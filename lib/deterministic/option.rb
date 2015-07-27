@@ -11,7 +11,7 @@ module Deterministic
       end
 
       def any?(expr)
-        to_option(expr) { expr.nil? || not(expr.respond_to?(:empty?)) || expr.empty? }
+        to_option(expr) { expr.nil? || (expr.respond_to?(:empty?) && expr.empty?) }
       end
 
       def to_option(expr, &predicate)
@@ -48,6 +48,8 @@ module Deterministic
     def none?
       is_a? Option::None
     end
+
+    alias :empty? :none?
 
     def value_or(n)
       match {
