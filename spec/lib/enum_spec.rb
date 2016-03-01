@@ -77,8 +77,8 @@ describe Deterministic::Enum  do
       res =
         MyEnym.match(b) {
           Nullary()  { 0 }
-          Unary(a) { [a, b] }
-          Binary(x, y) { [x, y]}
+          Unary(a) {|a| a }
+          Binary(x, y) {|x,y| [x, y] }
         }
 
       expect(res).to eq [1, 2]
@@ -86,8 +86,8 @@ describe Deterministic::Enum  do
       res =
         b.match {
           Nullary()  { 0 }
-          Unary(a) { [a, b] }
-          Binary(x, y) { [x, y]}
+          Unary(a) {|a| a }
+          Binary(x, y) {|x,y| [x, y] }
         }
 
       expect(res).to eq [1, 2]

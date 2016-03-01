@@ -1,5 +1,6 @@
 require 'spec_helper'
 
+# TODO: dead code?
 class Logger
     alias :m :method
 

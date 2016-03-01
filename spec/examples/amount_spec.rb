@@ -16,17 +16,17 @@ end
 Deterministic::impl(Amount) {
   def to_s
     match {
-      Due(a)  { "%0.2f" % [a] }
-      Paid(a) { "-%0.2f" % [a] }
-      Info(a) { "(%0.2f)" % [a] }
+      Due(a)  {|a| "%0.2f" % [a] }
+      Paid(a) {|a| "-%0.2f" % [a] }
+      Info(a) {|a| "(%0.2f)" % [a] }
     }
   end
 
   def to_f
     match {
-      Info(a) { 0 }
-      Due(a)  { a }
-      Paid(a) { -1 * a }
+      Info(a) {|a| 0 }
+      Due(a)  {|a| a }
+      Paid(a) {|a| -1 * a }
     }
   end
 

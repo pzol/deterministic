@@ -11,7 +11,7 @@ class ElasticSearchConfig
 
   def hosts
     Option.any?(proc_env["RESFINITY_LOG_CLIENT_ES_HOST"]).match {
-      Some(s) { { hosts: s.split(/, */) } }
+      Some(s) {|s| { hosts: s.split(/, */) } }
       None() { default_hosts }
     }
   end

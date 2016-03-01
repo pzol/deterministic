@@ -23,16 +23,16 @@ Deterministic::impl(Threenum) {
 
     match {
       Nullary()    { 0 }
-      Unary(u)     { u }
-      Binary(a, b) { a + b }
+      Unary(u)     {|u| u }
+      Binary(a, b) {|a,b| a + b }
     }
   end
 
   def +(other)
     match {
       Nullary()    { other.sum }
-      Unary(a)     { |this| this.sum + other.sum }
-      Binary(a, b) { |this| this.sum + other.sum }
+      Unary(a)     {|a| self.sum + other.sum }
+      Binary(a, b) {|a,b| self.sum + other.sum }
     }
   end
 }
