@@ -45,6 +45,7 @@ module Deterministic
         end
       end
 
+      # TODO: this should probably be named Multary
       module Binary
         def initialize(*init)
           raise ArgumentError, "Expected arguments for #{args}, got #{init}" unless (init.count == 1 && init[0].is_a?(Hash)) || init.count == args.count
@@ -177,17 +178,22 @@ module_function
         guard
       end
 
-      def method_missing(m)
-        m
-      end
-
       type_variants.each { |m|
-        define_method(m) { |*args, &block|
+        define_method(m) { |guard = nil, &block|
           raise ArgumentError, "No block given to `#{m}`" if block.nil?
+          params_spec = block.parameters
+          if params_spec.any? {|spec| spec.size < 2 }
+            raise ArgumentError, "Unnamed param found in block parameters: #{params_spec.inspect}"
+          end
+          if params_spec.any? {|spec| spec[0] != :req && spec[0] != :opt }
+            raise ArgumentError, "Only :req & :opt params allowed; parameters=#{params_spec.inspect}"
+          end
+          args = params_spec.map {|spec| spec[1] }
+
           type = Kernel.eval("#{mod.name}::#{m}")
 
-          if args.count > 0 && args[-1].is_a?(Proc)
-            guard = args.delete_at(-1)
+          if guard && !guard.is_a?(Proc)
+            guard = nil
           end
 
           @matches << [@obj, type, block, args, guard]

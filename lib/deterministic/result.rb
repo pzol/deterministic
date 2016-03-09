@@ -19,8 +19,8 @@ module Deterministic
   Deterministic::impl(Result) {
     def map(proc=nil, &block)
       match {
-        Success(_) { |_| self.bind(proc || block) }
-        Failure(_) { |_| self }
+        Success() {|_| self.bind(proc || block) }
+        Failure() {|_| self }
       }
     end
 
@@ -29,8 +29,8 @@ module Deterministic
 
     def map_err(proc=nil, &block)
       match {
-        Success(_) { |_| self }
-        Failure(_) { |_| self.bind(proc|| block) }
+        Success() {|_| self }
+        Failure() {|_| self.bind(proc|| block) }
       }
     end
 
@@ -54,26 +54,26 @@ module Deterministic
     def or(other)
       raise Deterministic::Monad::NotMonadError, "Expected #{other.inspect} to be a Result" unless other.is_a? Result
       match {
-        Success(_) { |_| self }
-        Failure(_) { |_| other }
+        Success() {|_| self }
+        Failure() {|_| other }
       }
     end
 
     def and(other)
       raise Deterministic::Monad::NotMonadError, "Expected #{other.inspect} to be a Result" unless other.is_a? Result
       match {
-        Success(_) { |_| other }
-        Failure(_) { |_| self }
+        Success() {|_| other }
+        Failure() {|_| self }
       }
     end
 
     def +(other)
       raise Deterministic::Monad::NotMonadError, "Expected #{other.inspect} to be a Result" unless other.is_a? Result
       match {
-        Success(s, where { other.success? } ) { |s| Result::Success.new(s + other.value) }
-        Failure(f, where { other.failure? } ) { |f| Result::Failure.new(f + other.value) }
-        Success(_) { |_| other } # implied other.failure?
-        Failure(_) { |_| self } # implied other.success?
+        Success(where { other.success? } ) {|s| Result::Success.new(s + other.value) }
+        Failure(where { other.failure? } ) {|f| Result::Failure.new(f + other.value) }
+        Success() {|_| other } # implied other.failure?
+        Failure() {|_| self } # implied other.success?
       }
     end
 

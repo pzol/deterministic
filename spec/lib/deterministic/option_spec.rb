@@ -75,8 +75,8 @@ describe Deterministic::Option do
   it "match" do
     expect(
       Some(0).match {
-        Some(s, where { s == 1 } ) { |s| 99 }
-        Some(s, where { s == 0 }) { |s| s + 1 }
+        Some(where { s == 1 }) {|s| 99 }
+        Some(where { s == 0 }) {|s| s + 1 }
         None() {}
       }
     ).to eq 1
@@ -84,14 +84,14 @@ describe Deterministic::Option do
     expect(
       Some(1).match {
         None() { 0 }
-        Some(s) {|s| 1 }
+        Some() {|s| 1 }
       }
     ).to eq 1
 
     expect(
       Some(1).match {
         None() { 0 }
-        Some(s, where { s.is_a? Fixnum }) {|s| 1 }
+        Some(where { s.is_a? Fixnum }) {|s| 1 }
       }
     ).to eq 1
 

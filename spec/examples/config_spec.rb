@@ -11,8 +11,8 @@ class ElasticSearchConfig
 
   def hosts
     Option.any?(proc_env["RESFINITY_LOG_CLIENT_ES_HOST"]).match {
-      Some(s) {|s| { hosts: s.split(/, */) } }
-      None() { default_hosts }
+      Some() {|s| { hosts: s.split(/, */) } }
+      None() { default_hosts }  # calls ElasticSearchConfig instance's method
     }
   end
 
@@ -31,7 +31,7 @@ private
 end
 
 describe ElasticSearchConfig do
-  pending("match exec context must have access to parents block binding context") {
+  # NOTE: the "empty" cases also verify that the variant matchers use the enclosing context as self
 
   let(:cfg) { ElasticSearchConfig.new(environment, env) }
   context "test" do
@@ -72,5 +72,4 @@ describe ElasticSearchConfig do
       specify { expect(cfg.hosts).to eq({ hosts: ["acc.resfinity.net:9200"] }) }
     end
   end
-}
 end

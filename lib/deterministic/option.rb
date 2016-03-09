@@ -29,15 +29,15 @@ module Deterministic
 
     def fmap(&fn)
       match {
-        Some(s) { |s| self.class.new(fn.(s)) }
-        None()  {     self }
+        Some() {|s| self.class.new(fn.(s)) }
+        None() {    self }
       }
     end
 
     def map(&fn)
       match {
-        Some(s) { |s| self.bind(&fn) }
-        None()  {     self }
+        Some() {|s| self.bind(&fn) }
+        None() {    self }
       }
     end
 
@@ -53,8 +53,8 @@ module Deterministic
 
     def value_or(n)
       match {
-        Some(s) { |s| s }
-        None()  {     n }
+        Some() {|s| s }
+        None() {    n }
       }
     end
 
@@ -65,9 +65,9 @@ module Deterministic
     def +(other)
       match {
         None() { other }
-        Some(_, where { !other.is_a?(Option)}) {|_| raise TypeError, "Other must be an #{Option}"}
-        Some(s, where { other.some? }) {|s| Option::Some.new(s + other.value) }
-        Some(_) {|_| self }
+        Some(where { !other.is_a?(Option) }) {|_| raise TypeError, "Other must be an #{Option}"}
+        Some(where { other.some? }) {|s| Option::Some.new(s + other.value) }
+        Some() {|_| self }
       }
     end
   }
