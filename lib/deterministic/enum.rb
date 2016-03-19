@@ -23,6 +23,16 @@ module Deterministic
         def name
           self.class.name.split("::")[-1]
         end
+
+        # Returns array. Will fail on Nullary objects.
+        # TODO: define a Unary module so we can define this method differently on Unary vs Binary
+        def wrapped_values
+          if self.is_a?(Deterministic::EnumBuilder::DataType::Binary)
+            value.values
+          else
+            [value]
+          end
+        end
       end
 
       module Nullary
@@ -35,6 +45,7 @@ module Deterministic
         end
       end
 
+      # TODO: this should probably be named Multary
       module Binary
         def initialize(*init)
           raise ArgumentError, "Expected arguments for #{args}, got #{init}" unless (init.count == 1 && init[0].is_a?(Hash)) || init.count == args.count
@@ -103,6 +114,8 @@ module_function
       class << self; private :new; end
 
       def self.match(obj, &block)
+        caller_ctx = block.binding.eval 'self'
+
         matcher = self::Matcher.new(obj)
         matcher.instance_eval(&block)
 
@@ -116,17 +129,19 @@ module_function
           obj, type, block, args, guard = match
 
           if args.count == 0
-            return instance_exec(obj, &block)
+            return caller_ctx.instance_eval(&block)
           else
-            raise Enum::MatchError, "Pattern (#{args.join(', ')}) must match (#{obj.args.join(', ')})" if args.count != obj.args.count
-            context = exec_context(obj, args)
+            if args.count != obj.args.count
+              raise Enum::MatchError, "Pattern (#{args.join(', ')}) must match (#{obj.args.join(', ')})"
+            end
+            guard_ctx = guard_context(obj, args)
 
             if guard
-              if context.instance_exec(obj, &guard)
-                return context.instance_exec(obj, &block)
+              if guard_ctx.instance_exec(obj, &guard)
+                return caller_ctx.instance_exec(* obj.wrapped_values, &block)
               end
             else
-              return context.instance_exec(obj, &block)
+              return caller_ctx.instance_exec(* obj.wrapped_values, &block)
             end
           end
         }
@@ -137,7 +152,7 @@ module_function
       def self.variants; constants - [:Matcher, :MatchError]; end
 
       private
-      def self.exec_context(obj, args)
+      def self.guard_context(obj, args)
         if obj.is_a?(Deterministic::EnumBuilder::DataType::Binary)
           Struct.new(*(args)).new(*(obj.value.values))
         else
@@ -163,17 +178,22 @@ module_function
         guard
       end
 
-      def method_missing(m)
-        m
-      end
-
       type_variants.each { |m|
-        define_method(m) { |*args, &block|
+        define_method(m) { |guard = nil, &block|
           raise ArgumentError, "No block given to `#{m}`" if block.nil?
+          params_spec = block.parameters
+          if params_spec.any? {|spec| spec.size < 2 }
+            raise ArgumentError, "Unnamed param found in block parameters: #{params_spec.inspect}"
+          end
+          if params_spec.any? {|spec| spec[0] != :req && spec[0] != :opt }
+            raise ArgumentError, "Only :req & :opt params allowed; parameters=#{params_spec.inspect}"
+          end
+          args = params_spec.map {|spec| spec[1] }
+
           type = Kernel.eval("#{mod.name}::#{m}")
 
-          if args.count > 0 && args[-1].is_a?(Proc)
-            guard = args.delete_at(-1)
+          if guard && !guard.is_a?(Proc)
+            guard = nil
           end
 
           @matches << [@obj, type, block, args, guard]

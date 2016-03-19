@@ -1,3 +1,4 @@
+# TODO: remove dead code
 module Deterministic
   module PatternMatching
 

@@ -20,19 +20,18 @@ Threenum = Deterministic::enum {
 
 Deterministic::impl(Threenum) {
   def sum
-
     match {
-      Nullary()    { 0 }
-      Unary(u)     { u }
-      Binary(a, b) { a + b }
+      Nullary() {        0 }
+      Unary()   { |u|    u }
+      Binary()  { |a, b| a + b }
     }
   end
 
   def +(other)
     match {
-      Nullary()    { other.sum }
-      Unary(a)     { |this| this.sum + other.sum }
-      Binary(a, b) { |this| this.sum + other.sum }
+      Nullary() {        other.sum }
+      Unary()   { |a|    self.sum + other.sum }
+      Binary()  { |a, b| self.sum + other.sum }
     }
   end
 }

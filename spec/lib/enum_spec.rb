@@ -27,7 +27,7 @@ describe Deterministic::Enum  do
       expect(n).to be_a MyEnym
       expect(n).to be_a MyEnym::Nullary
       expect(n.name).to eq "Nullary"
-      expect { n.value }.to raise_error
+      expect { n.value }.to raise_error NoMethodError
       expect(n.inspect).to eq "Nullary"
       expect(n.to_s).to eq ""
       expect(n.fmap { }).to eq n
@@ -77,8 +77,8 @@ describe Deterministic::Enum  do
       res =
         MyEnym.match(b) {
           Nullary()  { 0 }
-          Unary(a) { [a, b] }
-          Binary(x, y) { [x, y]}
+          Unary() {|a| a }
+          Binary() {|x,y| [x, y] }
         }
 
       expect(res).to eq [1, 2]
@@ -86,8 +86,8 @@ describe Deterministic::Enum  do
       res =
         b.match {
           Nullary()  { 0 }
-          Unary(a) { [a, b] }
-          Binary(x, y) { [x, y]}
+          Unary() {|a| a }
+          Binary() {|x,y| [x, y] }
         }
 
       expect(res).to eq [1, 2]
@@ -98,10 +98,10 @@ describe Deterministic::Enum  do
       }.to raise_error(NameError)
 
       expect { b.match {
-        Nullary()
-        Unary()
-        Binary()
-      }
+                 Nullary()
+                 Unary()
+                 Binary()
+               }
       }.to raise_error ArgumentError, "No block given to `Nullary`"
     end
   end

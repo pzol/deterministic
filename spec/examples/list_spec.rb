@@ -13,9 +13,9 @@ describe List do
     it "catches ignores guards with non-matching clauses" do
       expect(
         list.match {
-          Nil()       { self }
-          Cons(h, t, where { h == 0 })  { h }
-          Cons(h, t)  { h }
+          Nil()       { list }
+          Cons(where { h == 0 }) {|h,t| h }
+          Cons()  {|h, t| h }
         }).to eq 1
     end
 
@@ -23,15 +23,15 @@ describe List do
       expect( # guard catched
         list.match {
           Nil() { raise "unreachable" }
-          Cons(h, t, where { h == 1 })  { h + 1 }
-          Cons(h, t)  { h }
+          Cons(where { h == 1 }) {|h,t| h + 1 }
+          Cons() {|h| h }
         }).to eq 2
     end
 
     it "raises an error when no match was made" do
       expect {
         list.match {
-          Cons(_, _, where { true == false }) { 1 }
+          Cons(where { true == false }) {|_, _| 1 }
           Nil(where { true == false }) { 0 }
         }
       }.to raise_error(Deterministic::Enum::MatchError)
@@ -40,7 +40,7 @@ describe List do
     it "raises an error when the match is not exhaustive" do
       expect {
         list.match {
-          Cons(_, _) {}
+          Cons() {|_, _| }
         }
       }.to raise_error(Deterministic::Enum::MatchError)
     end

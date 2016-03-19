@@ -1,5 +1,6 @@
 require 'spec_helper'
 
+# TODO: dead code?
 class Logger
     alias :m :method
 
@@ -14,6 +15,7 @@ class Logger
   private
     attr_reader :repository
 
+    # TODO: this is never called; the matcher syntax is old
     def validate(item)
       return Failure(["Item cannot be empty"]) if item.blank?
       return Failure(["Item must be a Hash"]) unless item.is_a?(Hash)

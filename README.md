@@ -213,13 +213,15 @@ Now that you have some result, you want to control flow by providing patterns.
 
 ```ruby
 Success(1).match do
-  Success(s) { |v| "success #{s}"}
-  Failure(f) { |v| "failure #{f}"}
+  Success() { |s| "success #{s}"}
+  Failure() { |f| "failure #{f}"}
 end # => "success 1"
 ```
-Note1: the inner value has been unwrapped! 
+Note1: the variant's inner value(s) have been unwrapped, and passed to the block.
 
 Note2: only the __first__ matching pattern block will be executed, so order __can__ be important.
+
+Note3: you can omit block parameters if you don't use them, or you can use `_` to signify that you don't care about their values. If you specify parameters, their number must match the number of values in the variant.
 
 The result returned will be the result of the __first__ `#try` or `#let`. As a side note, `#try` is a monad, `#let` is a functor.
 
@@ -227,15 +229,19 @@ Guards
 
 ```ruby
 Success(1).match do
-  Success(s, where { s == 1 }) { "Success #{s}" }
+  Success(where { s == 1 }) { |s| "Success #{s}" }
 end # => "Success 1"
 ```
+
+Note1: the guard has access to variable names defined by the block arguments.
+
+Note2: the guard is not evaluated using the enclosing context's `self`; if you need to call methods on the enclosing scope, you must specify a receiver.
 
 Also you can match the result class
 
 ```ruby
 Success([1, 2, 3]).match do
-  Success(s, where { s.is_a?(Array)} ) { s.first }
+  Success(where { s.is_a?(Array) }) { |s| s.first }
 end # => 1
 ```
 
@@ -243,7 +249,7 @@ If no match was found a `NoMatchError` is raised, so make sure you always cover 
 
 ```ruby
 Success(1).match do
-  Failure(f) { "you'll never get me" }
+  Failure() { |f| "you'll never get me" }
 end # => NoMatchError
 ```
 
@@ -323,9 +329,9 @@ Option.try! { raise "error"}           # => None
 ### Pattern Matching
 ```ruby
 Some(1).match {
-  Some(s, where { s == 1 }) { s + 1 }
-  Some(s)                   { 1 }
-  None()                    { 0 }
+  Some(where { s == 1 }) { |s| s + 1 }
+  Some()                 { |s| 1 }
+  None()                 { 0 }
 }                                      # => 2
 ```
 
@@ -361,28 +367,28 @@ Pattern matching
 
 ```ruby
 Threenum::Unary(5).match {
-  Nullary()     { 0 }
-  Unary(u)      { u }
-  Binary(a, b)  { a + b }
+  Nullary() {        0 }
+  Unary()   { |u|    u }
+  Binary()  { |a, b| a + b }
 }                                      # => 5
 
 # or
 t = Threenum::Unary(5)
 Threenum.match(t) {
-  Nullary()     { 0 }
-  Unary(u)      { u }
-  Binary(a, b)  { a + b }
+  Nullary() {        0 }
+  Unary()   { |u|    u }
+  Binary()  { |a, b| a + b }
 }                                      # => 5
 ```
 
-If you want the whole thing use the arg passed to the block (second case)
+If you want to return the whole matched object, you'll need to pass a reference to the object (second case). Note that `self` refers to the scope enclosing the `match` call.
 
 ```ruby
 def drop(n)
   match {
-    Cons(h, t, where { n > 0 }) { t.drop(n - 1) }
-    Cons(_, _) { |c| c }
-    Nil() { raise EmptyListError}
+    Cons(where { n > 0 }) { |h, t| t.drop(n - 1) }
+    Cons()                { |_, _| self }
+    Nil() { raise EmptyListError }
   }
 end
 ```
@@ -393,10 +399,10 @@ With guard clauses
 
 ```ruby
 Threenum::Unary(5).match {
-  Nullary()     { 0 }
-  Unary(u)      { u }
-  Binary(a, b, where { a.is_a?(Fixnum) && b.is_a?(Fixnum)})  { a + b }
-  Binary(a, b)  { raise "Expected a, b to be numbers" }
+  Nullary() {     0 }
+  Unary()   { |u| u }
+  Binary(where { a.is_a?(Fixnum) && b.is_a?(Fixnum) }) { |a, b| a + b }
+  Binary()  { |a, b| raise "Expected a, b to be numbers" }
 }                                      # => 5
 ```
 
@@ -406,17 +412,17 @@ Implementing methods for enums
 Deterministic::impl(Threenum) {
   def sum
     match {
-      Nullary()    { 0 }
-      Unary(u)     { u }
-      Binary(a, b) { a + b }
+      Nullary() {        0 }
+      Unary()   { |u|    u }
+      Binary()  { |a, b| a + b }
     }
   end
 
   def +(other)
     match {
-      Nullary()    { other.sum }
-      Unary(a)     { |this| this.sum + other.sum }
-      Binary(a, b) { |this| this.sum + other.sum }
+      Nullary() {        other.sum }
+      Unary()   { |a|    self.sum + other.sum }
+      Binary()  { |a, b| self.sum + other.sum }
     }
   end
 }
