@@ -28,7 +28,7 @@ Deterministic::impl(List) {
 
   def first
     match {
-      Cons() {|_, _| self }
+      Cons() {|_, __| self }
       Nil() {  self }
     }
   end
@@ -133,7 +133,7 @@ Deterministic::impl(List) {
   def take(n)
     match {
       Cons(where { n > 0 }) {|h, t| Cons.new(h, t.take(n - 1)) }
-      Cons() {|_, _| Nil.new }
+      Cons() {|_, __| Nil.new }
       Nil() { raise EmptyListError }
     }
   end
@@ -141,7 +141,7 @@ Deterministic::impl(List) {
   def drop(n)
     match {
       Cons(where { n > 0 }) {|h, t| t.drop(n - 1) }
-      Cons() {|_, _| self }
+      Cons() {|_, __| self }
       Nil() { raise EmptyListError }
     }
   end

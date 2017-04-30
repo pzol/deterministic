@@ -31,7 +31,7 @@ describe List do
     it "raises an error when no match was made" do
       expect {
         list.match {
-          Cons(where { true == false }) {|_, _| 1 }
+          Cons(where { true == false }) {|_, __| 1 }
           Nil(where { true == false }) { 0 }
         }
       }.to raise_error(Deterministic::Enum::MatchError)
