@@ -202,6 +202,79 @@ end
 Success(1) >= method(:error) # Failure(RuntimeError(error 1))
 ```
 
+### Chaining with #in_sequence
+
+When creating long chains with e.g. `#>>`, it can get cumbersome carrying
+around the entire context required for every function within the chain. Also,
+every function within the chain requires some boilerplate code for extracting the
+relevant information from the context.
+
+Similarly to, for example, the `do` notation in Haskell and _sequence
+comprehensions_ or _for comprehensions_ in Scala, `#in_sequence` can be used to
+streamline the same process while keeping the code more readable. Using
+`#in_sequence` provides all the benefits of using the `Result` monad while
+still allowing to write code that reads very much like standard imperative
+Ruby.
+
+Here's an example:
+
+```ruby
+class Foo
+  include Deterministic::Prelude
+
+  def call(input)
+    in_sequence do
+      get(:sanitized_input) { sanitize(input) }
+      and_then              { validate(sanitized_input) }
+      get(:user)            { get_user_from_db(sanitized_input) }
+      get(:request)         { build_request(sanitized_input, user) }
+      observe               { log('sending request', request) }
+      get(:response)        { send_request(request) }
+      observe               { log('got response', response) }
+      and_yield             { format_response(response) }
+    end
+  end
+
+  def sanitize(input)
+    sanitized_input = input
+    Success(sanitized_input)
+  end
+
+  def validate(sanitized_input)
+    Success(sanitized_input)
+  end
+
+  def get_user_from_db(sanitized_input)
+    Success(type: :admin, id: sanitized_input.fetch(:id))
+  end
+
+  def build_request(sanitized_input, user)
+    Success(input: sanitized_input, user: user)
+  end
+
+  def log(message, data)
+    # logger.info(message, data)
+  end
+
+  def send_request(request)
+    Success(status: 200)
+  end
+
+  def format_response(response)
+    Success(response: response, message: 'it worked')
+  end
+end
+
+Foo.new.call(id: 1)
+```
+
+Notice how the functions don't necessarily have to accept only a single
+argument (`build_request` accepts 2). Also notice how the methods can be used
+directly, without having to call `#method` or having them return procs.
+
+The chain will still be short-circuited when e.g. `#validate` returns a
+`Failure`.
+
 ### Pattern matching
 Now that you have some result, you want to control flow by providing patterns.
 `#match` can match by
