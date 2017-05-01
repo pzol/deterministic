@@ -1,3 +1,12 @@
+## v0.16.0
+** breaking changes **
+
+- Evaluate variant match blocks in the match() caller's context
+- Variant match blocks are passed the variant's values as arguments (first
+  argument is no longer the variant instance)
+- Variant matchers no longer accept arguments for naming the variant's values;
+  the names are determined by the block's arguments.
+
 ## v0.14.1
 
 - Make Ruby 1.9.3 compatible
