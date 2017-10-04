@@ -121,7 +121,7 @@ describe Deterministic::Sequencer do
           get(:get_result) { getter }
           and_yield { arbitrary_success }
         end
-      end.to raise_error(NoMethodError)
+      end.to raise_error(NameError)
     end
 
     it 'its result is available in a subsequent #and_then' do
@@ -145,7 +145,7 @@ describe Deterministic::Sequencer do
           get(:get_result) { getter }
           and_yield { arbitrary_success }
         end
-      end.to raise_error(NoMethodError)
+      end.to raise_error(NameError)
     end
 
     it 'its result is available in a subsequent #observe' do
@@ -169,7 +169,7 @@ describe Deterministic::Sequencer do
           get(:get_result) { getter }
           and_yield { arbitrary_success }
         end
-      end.to raise_error(NoMethodError)
+      end.to raise_error(NameError)
     end
 
     it 'its result is available in #and_yield' do
@@ -445,6 +445,15 @@ describe Deterministic::Sequencer do
     end
   end
 
+
+  it 'does not allow calling methods outside of the wrapped instance' do
+    expect do
+      in_sequence do
+        and_yield { top_level_test_method }
+      end
+    end.to raise_error(NameError)
+  end
+
   context 'when including Deterministic::Prelude' do
     let(:test_class) { Class.new { include Deterministic::Prelude } }
 
@@ -542,4 +551,8 @@ describe Deterministic::Sequencer do
       in_sequence(&block)
     end
   end
+end
+
+def top_level_test_method
+  :empty
 end
