@@ -81,25 +81,22 @@ module Deterministic
     # OperationWrapper proxies all method calls to the wrapped instance, but
     # first checks if the name of the called method matches a value stored
     # within @gotten_results and returns the value if it does.
-    class OperationWrapper
-      def initialize(instance)
-        @instance = instance
+    class OperationWrapper < SimpleDelegator
+      def initialize(*args)
+        super
         @gotten_results = {}
       end
 
-      # Disable rubocop rule which requires the method to fall back onto super,
-      # which is not what we want to do here, because we want the wrapped
-      # instance to have the last word.
-      def method_missing(name, *args, &block) # rubocop:disable Style/MethodMissing
+      def method_missing(name, *args, &block)
         if @gotten_results.key?(name)
           @gotten_results[name]
         else
-          @instance.send(name, *args, &block)
+          super
         end
       end
 
       def respond_to_missing?(name, include_private = false)
-        @gotten_results.key?(name) || @instance.send(:respond_to_missing?, name, include_private)
+        @gotten_results.key?(name) || super
       end
     end
   end
