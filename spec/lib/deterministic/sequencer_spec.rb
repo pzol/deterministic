@@ -37,6 +37,15 @@ describe Deterministic::Sequencer do
     end.to raise_error(described_class::InvalidSequenceError, 'and_yield already called')
   end
 
+  it 'does not allow calling #let after #and_yield' do
+    expect do
+      in_sequence do
+        and_yield { arbitrary_success }
+        let(:_) { arbitrary_success }
+      end
+    end.to raise_error(described_class::InvalidSequenceError, 'and_yield already called')
+  end
+
   it 'does not allow calling #and_then after #and_yield' do
     expect do
       in_sequence do
@@ -259,6 +268,123 @@ describe Deterministic::Sequencer do
     end
   end
 
+  context 'when #let succeeds' do
+    let(:object) { {a: 'a'} }
+    before { allow(test_instance).to receive(:object).and_return(object) }
+
+    it 'its result is available in a subsequent #let' do
+      allow(test_instance).to receive(:test_function)
+
+      in_sequence do
+        let(:a) { object.fetch(:a) }
+        let(:_) { test_function(a) }
+        and_yield { arbitrary_success }
+      end
+
+      expect(test_instance).to have_received(:test_function).with(object.fetch(:a))
+    end
+
+    it 'its result is not available in a previous #let' do
+      allow(test_instance).to receive(:test_function)
+
+      expect do
+        in_sequence do
+          let(:_) { test_function(a) }
+          let(:a) { object.fetch(:a) }
+          and_yield { arbitrary_success }
+        end
+      end.to raise_error(NoMethodError)
+    end
+
+    it 'its result is available in a subsequent #and_then' do
+      allow(test_instance).to receive(:and_then_function).and_return(arbitrary_success)
+
+      in_sequence do
+        let(:a) { object.fetch(:a) }
+        and_then { and_then_function(a) }
+        and_yield { arbitrary_success }
+      end
+
+      expect(test_instance).to have_received(:and_then_function).with(object.fetch(:a))
+    end
+
+    it 'its result is not available in a previous #and_then' do
+      allow(test_instance).to receive(:and_then_function)
+
+      expect do
+        in_sequence do
+          and_then { and_then_function(a) }
+          let(:a) { object.fetch(:a) }
+          and_yield { arbitrary_success }
+        end
+      end.to raise_error(NoMethodError)
+    end
+
+    it 'its result is available in a subsequent #observe' do
+      allow(test_instance).to receive(:observer)
+
+      in_sequence do
+        let(:a) { object.fetch(:a) }
+        observe { observer(a) }
+        and_yield { arbitrary_success }
+      end
+
+      expect(test_instance).to have_received(:observer).with(object.fetch(:a))
+    end
+
+    it 'its result is not available in a previous #observe' do
+      allow(test_instance).to receive(:observer)
+
+      expect do
+        in_sequence do
+          observe { observer(a) }
+          let(:a) { object.fetch(:a) }
+          and_yield { arbitrary_success }
+        end
+      end.to raise_error(NoMethodError)
+    end
+
+    it 'its result is available in #and_yield' do
+      allow(test_instance).to receive(:yielder).and_return(arbitrary_success)
+
+      in_sequence do
+        let(:a) { object.fetch(:a) }
+        and_yield { yielder(a) }
+      end
+
+      expect(test_instance).to have_received(:yielder).with(object.fetch(:a))
+    end
+  end
+
+  context 'when #let raises an error' do
+    let(:object) { {a: 'a'} }
+    before { allow(test_instance).to receive(:object).and_return(object) }
+
+    it 'bubbles the raised error' do
+      expect do
+        in_sequence do
+          let(:b) { object.fetch(:b) }
+          and_yield { arbitrary_success }
+        end
+      end.to raise_error(KeyError)
+    end
+
+    it 'does not invoke #and_yield' do
+      allow(test_instance).to receive(:yielder).and_return(arbitrary_success)
+
+      begin
+        in_sequence do
+          let(:b) { object.fetch(:b) }
+          and_yield { yielder }
+        end
+      rescue KeyError
+        # Ignore
+      end
+
+      expect(test_instance).not_to have_received(:yielder)
+    end
+  end
+
   context 'when #and_then succeeds' do
     let(:and_then_result) { Success('and_then') }
     before { allow(test_instance).to receive(:and_then_function).and_return(and_then_result) }
@@ -341,6 +467,8 @@ describe Deterministic::Sequencer do
             get(:sanitized_input) { sanitize(input) }
             and_then              { validate(sanitized_input) }
             get(:user)            { get_user_from_db(sanitized_input) }
+            let(:name)            { user.fetch(:name) }
+            observe               { log('user name', name) }
             get(:request)         { build_request(sanitized_input, user) }
             observe               { log('sending request', request) }
             get(:response)        { send_request(request) }
@@ -359,7 +487,7 @@ describe Deterministic::Sequencer do
         end
 
         def get_user_from_db(sanitized_input)
-          Success(type: :admin, id: sanitized_input.fetch(:id))
+          Success(type: :admin, id: sanitized_input.fetch(:id), name: 'John')
         end
 
         def build_request(sanitized_input, user)
@@ -395,9 +523,12 @@ describe Deterministic::Sequencer do
       test_instance.call(id: 1)
 
       expect(test_instance).to have_received(:log)
+        .with('user name', 'John')
+        .ordered
+      expect(test_instance).to have_received(:log)
         .with('sending request',
           input: {id: 1},
-          user: {type: :admin, id: 1}
+          user: {type: :admin, id: 1, name: 'John'}
         )
         .ordered
       expect(test_instance).to have_received(:log)

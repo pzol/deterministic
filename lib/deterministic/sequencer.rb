@@ -4,6 +4,7 @@ module Deterministic
 
     Operation = Deterministic.enum do
       Get(:block, :name)
+      Let(:block, :name)
       AndThen(:block)
       Observe(:block)
     end
@@ -25,6 +26,13 @@ module Deterministic
         raise InvalidSequenceError, 'and_yield already called'.freeze if @sequenced_operations
 
         @operations.unshift(Operation::Get(block, name))
+      end
+
+      def let(name, &block)
+        raise ArgumentError, 'no block given'.freeze unless block_given?
+        raise InvalidSequenceError, 'and_yield already called'.freeze if @sequenced_operations
+
+        @operations.unshift(Operation::Let(block, name))
       end
 
       def and_then(&block)
@@ -56,6 +64,10 @@ module Deterministic
                   @gotten_results[name] = output
                   instance_eval(&memo)
                 end
+              end
+              Let do |block, name|
+                @gotten_results[name] = instance_eval(&block)
+                instance_eval(&memo)
               end
               AndThen do |block|
                 instance_eval(&block).map do |_|
