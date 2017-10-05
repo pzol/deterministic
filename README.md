@@ -275,6 +275,22 @@ directly, without having to call `#method` or having them return procs.
 The chain will still be short-circuited when e.g. `#validate` returns a
 `Failure`.
 
+Here's what the operators used in this example mean:
+* `get` - Execute the provided block and expect a `Result` as its return value.
+  If the `Result` is a `Success`, then the `Success` value is assigned to the
+  specified identifier. The value is then accessible in subsequent blocks by
+  that identifier. If the `Result` is a `Failure`, then the entire chain will
+  be short-circuited and the `Failure` will be returned as the result of the
+  `in_sequence` call.
+* `and_then` - Execute the provided block and expect a `Result` as its return
+  value. If the `Result` is a `Success`, then the chain continues, otherwise
+  the chain is short-circuited and the `Failure` will be returned as the result
+  of the `in_sequence` call.
+* `observe` - Execute the provided block whose return value will be ignored.
+  The chain continues regardless.
+* `and_yield` - Execute the provided block and expect a `Result` as its return
+  value. The `Result` will be returned as the result of the `in_sequence` call.
+
 ### Pattern matching
 Now that you have some result, you want to control flow by providing patterns.
 `#match` can match by
