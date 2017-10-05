@@ -227,6 +227,8 @@ class Foo
       get(:sanitized_input) { sanitize(input) }
       and_then              { validate(sanitized_input) }
       get(:user)            { get_user_from_db(sanitized_input) }
+      let(:name)            { user.fetch(:name) }
+      observe               { log('user name', name) }
       get(:request)         { build_request(sanitized_input, user) }
       observe               { log('sending request', request) }
       get(:response)        { send_request(request) }
@@ -245,7 +247,7 @@ class Foo
   end
 
   def get_user_from_db(sanitized_input)
-    Success(type: :admin, id: sanitized_input.fetch(:id))
+    Success(type: :admin, id: sanitized_input.fetch(:id), name: 'John')
   end
 
   def build_request(sanitized_input, user)
@@ -282,6 +284,10 @@ Here's what the operators used in this example mean:
   that identifier. If the `Result` is a `Failure`, then the entire chain will
   be short-circuited and the `Failure` will be returned as the result of the
   `in_sequence` call.
+* `let` - Execute the provided block and assign its result to the specified
+  identifier. The result can be anything - it is *not* expected to be
+  a `Result`. This is useful for simple assignments that don't need to be
+  wrapped in a `Result`. E.g. `let(:four) { 2 + 2 }`.
 * `and_then` - Execute the provided block and expect a `Result` as its return
   value. If the `Result` is a `Success`, then the chain continues, otherwise
   the chain is short-circuited and the `Failure` will be returned as the result
