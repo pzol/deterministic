@@ -118,7 +118,7 @@ try! { raise "hell" }                  # => Failure(#<RuntimeError: hell>)
 
 ### Result Chaining
 
-You can easily chain the execution of several operations. Here we got some nice function composition.  
+You can easily chain the execution of several operations. Here we got some nice function composition.
 The method must be a unary function, i.e. it always takes one parameter - the context, which is passed from call to call.
 
 The following aliases are defined
