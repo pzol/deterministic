@@ -2,11 +2,12 @@ module Deterministic
   module Sequencer
     InvalidSequenceError = Class.new(StandardError)
 
-    Operation = Deterministic.enum do
-      Get(:block, :name)
-      Let(:block, :name)
-      AndThen(:block)
-      Observe(:block)
+    module Operation
+      Get = Struct.new(:block, :name)
+      Let = Struct.new(:block, :name)
+      AndThen = Struct.new(:block)
+      Observe = Struct.new(:block)
+      AndYield = Struct.new(:block)
     end
 
     def in_sequence(&block)
@@ -25,68 +26,104 @@ module Deterministic
         raise ArgumentError, 'no block given'.freeze unless block_given?
         raise InvalidSequenceError, 'and_yield already called'.freeze if @sequenced_operations
 
-        @operations.unshift(Operation::Get(block, name))
+        @operations << Operation::Get.new(block, name)
       end
 
       def let(name, &block)
         raise ArgumentError, 'no block given'.freeze unless block_given?
         raise InvalidSequenceError, 'and_yield already called'.freeze if @sequenced_operations
 
-        @operations.unshift(Operation::Let(block, name))
+        @operations << Operation::Let.new(block, name)
       end
 
       def and_then(&block)
         raise ArgumentError, 'no block given'.freeze unless block_given?
         raise InvalidSequenceError, 'and_yield already called'.freeze if @sequenced_operations
 
-        @operations.unshift(Operation::AndThen(block))
+        @operations << Operation::AndThen.new(block)
       end
 
       def observe(&block)
         raise ArgumentError, 'no block given'.freeze unless block_given?
         raise InvalidSequenceError, 'and_yield already called'.freeze if @sequenced_operations
 
-        @operations.unshift(Operation::Observe(block))
+        @operations << Operation::Observe.new(block)
       end
 
-      def and_yield(&yield_block)
+      def and_yield(&block)
         raise ArgumentError, 'no block given'.freeze unless block_given?
         raise InvalidSequenceError, 'and_yield already called'.freeze if @sequenced_operations
 
-        @sequenced_operations = @operations.inject(yield_block) do |memo, cur|
-          lambda do |*|
-            cur.match do
-              Get do |block, name|
-                instance_eval(&block).map do |output|
-                  # This will be executed in the context of the OperationWrapper
-                  # and so the results will be stored within the
-                  # OperationWrapper.
-                  @gotten_results[name] = output
-                  instance_eval(&memo)
-                end
-              end
-              Let do |block, name|
-                @gotten_results[name] = instance_eval(&block)
-                instance_eval(&memo)
-              end
-              AndThen do |block|
-                instance_eval(&block).map do |_|
-                  instance_eval(&memo)
-                end
-              end
-              Observe do |block|
-                instance_eval(&block)
-                instance_eval(&memo)
-              end
-            end
-          end
-        end
+        @operations << Operation::AndYield.new(block)
+
+        prepare_sequenced_operators
+
+        # @sequenced_operations = @operations.reverse.inject(yield_block) do |memo, cur|
+        #   lambda do |*|
+        #     case cur
+        #     when Operation::Get
+        #       instance_eval(&cur.block).map do |output|
+        #         # This will be executed in the context of the OperationWrapper
+        #         # and so the results will be stored within the
+        #         # OperationWrapper.
+        #         @gotten_results[cur.name] = output
+        #         instance_eval(&memo)
+        #       end
+        #     when Operation::Let
+        #       @gotten_results[cur.name] = instance_eval(&cur.block)
+        #       instance_eval(&memo)
+        #     when Operation::AndThen
+        #       instance_eval(&cur.block).map do |_|
+        #         instance_eval(&memo)
+        #       end
+        #     when Operation::Observe
+        #       instance_eval(&cur.block)
+        #       instance_eval(&memo)
+        #     end
+        #   end
+        # end
       end
 
       def yield
         raise InvalidSequenceError, 'and_yield not called'.freeze unless @sequenced_operations
 
         @operation_wrapper.instance_eval(&@sequenced_operations)
+      end
+
+      private
+
+      def prepare_sequenced_operators
+        operations = @operations
+
+        @sequenced_operations = lambda do |_|
+          operations.reduce(Result::Success(nil)) do |last_result, operation|
+            last_result.map do
+              case operation
+              when Operation::Get
+                result = instance_eval(&operation.block)
+                result.map do |output|
+                  # This will be executed in the context of the OperationWrapper
+                  # and so the results will be stored within the
+                  # OperationWrapper.
+                  @gotten_results[operation.name] = output
+                  result
+                end
+              when Operation::Let
+                @gotten_results[operation.name] = instance_eval(&operation.block)
+                last_result
+              when Operation::AndThen
+                instance_eval(&operation.block)
+              when Operation::Observe
+                instance_eval(&operation.block)
+                last_result
+              when Operation::AndYield
+                instance_eval(&operation.block)
+              else
+                "Uknown operation: #{operation.class}"
+              end
+            end
+          end
+        end
       end
     end
 

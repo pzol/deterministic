@@ -18,20 +18,14 @@ module Deterministic
 
   Deterministic::impl(Result) {
     def map(proc=nil, &block)
-      match {
-        Success() {|_| self.bind(proc || block) }
-        Failure() {|_| self }
-      }
+      success? ? bind(proc || block) : self
     end
 
     alias :>> :map
     alias :and_then :map
 
     def map_err(proc=nil, &block)
-      match {
-        Success() {|_| self }
-        Failure() {|_| self.bind(proc|| block) }
-      }
+      failure? ? bind(proc || block) : self
     end
 
     alias :or_else :map_err
