@@ -293,7 +293,7 @@ describe Deterministic::Sequencer do
           let(:a) { object.fetch(:a) }
           and_yield { arbitrary_success }
         end
-      end.to raise_error(NoMethodError)
+      end.to raise_error(NameError)
     end
 
     it 'its result is available in a subsequent #and_then' do
@@ -317,7 +317,7 @@ describe Deterministic::Sequencer do
           let(:a) { object.fetch(:a) }
           and_yield { arbitrary_success }
         end
-      end.to raise_error(NoMethodError)
+      end.to raise_error(NameError)
     end
 
     it 'its result is available in a subsequent #observe' do
@@ -341,7 +341,7 @@ describe Deterministic::Sequencer do
           let(:a) { object.fetch(:a) }
           and_yield { arbitrary_success }
         end
-      end.to raise_error(NoMethodError)
+      end.to raise_error(NameError)
     end
 
     it 'its result is available in #and_yield' do
