@@ -57,31 +57,6 @@ module Deterministic
         @operations << Operation::AndYield.new(block)
 
         prepare_sequenced_operators
-
-        # @sequenced_operations = @operations.reverse.inject(yield_block) do |memo, cur|
-        #   lambda do |*|
-        #     case cur
-        #     when Operation::Get
-        #       instance_eval(&cur.block).map do |output|
-        #         # This will be executed in the context of the OperationWrapper
-        #         # and so the results will be stored within the
-        #         # OperationWrapper.
-        #         @gotten_results[cur.name] = output
-        #         instance_eval(&memo)
-        #       end
-        #     when Operation::Let
-        #       @gotten_results[cur.name] = instance_eval(&cur.block)
-        #       instance_eval(&memo)
-        #     when Operation::AndThen
-        #       instance_eval(&cur.block).map do |_|
-        #         instance_eval(&memo)
-        #       end
-        #     when Operation::Observe
-        #       instance_eval(&cur.block)
-        #       instance_eval(&memo)
-        #     end
-        #   end
-        # end
       end
 
       def yield
