@@ -190,7 +190,7 @@ module_function
           end
           args = params_spec.map {|spec| spec[1] }
 
-          type = Kernel.eval("#{mod.name}::#{m}")
+          type = mod.const_get(m)
 
           if guard && !guard.is_a?(Proc)
             guard = nil
