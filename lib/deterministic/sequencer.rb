@@ -111,7 +111,7 @@ module Deterministic
         @gotten_results = {}
       end
 
-      def method_missing(name, *args, &block)
+      ruby2_keywords def method_missing(name, *args, &block)
         if @gotten_results.key?(name)
           @gotten_results[name]
         else
