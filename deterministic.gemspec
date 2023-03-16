@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{see above}
   spec.homepage      = "http://github.com/pzol/deterministic"
   spec.license       = "MIT"
-  spec.required_ruby_version = '>=1.9.3'
+  spec.required_ruby_version = '>=2.7'
 
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
