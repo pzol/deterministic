@@ -163,7 +163,7 @@ describe List do
 
   context "all?" do
     subject(:list) { List[21, 15, 9] }
-    specify { expect(list.all? { |n| n.is_a?(Fixnum) }).to be_truthy }
+    specify { expect(list.all? { |n| n.is_a?(Integer) }).to be_truthy }
   end
 
   context "any?" do

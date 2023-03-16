@@ -1,3 +1,5 @@
+require 'delegate'
+
 module Deterministic
   module Sequencer
     InvalidSequenceError = Class.new(StandardError)

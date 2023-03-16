@@ -91,7 +91,7 @@ describe Deterministic::Option do
     expect(
       Some(1).match {
         None() { 0 }
-        Some(where { s.is_a? Fixnum }) {|s| 1 }
+        Some(where { s.is_a? Integer }) {|s| 1 }
       }
     ).to eq 1
 

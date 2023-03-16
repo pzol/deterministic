@@ -57,7 +57,7 @@ class Null
     false
   end
 
-  def respond_to?(m)
+  def respond_to?(m, *args)
     return true if @methods.empty? || @methods.include?(m)
     super
   end

@@ -69,8 +69,8 @@ describe Deterministic::Enum  do
     end
 
     it "generated enum" do
-      expect(MyEnym.variants).to eq [:Nullary, :Unary, :Binary]
-      expect(MyEnym.constants.inspect).to eq "[:Nullary, :Unary, :Binary, :Matcher]"
+      expect(MyEnym.variants).to contain_exactly(:Nullary, :Unary, :Binary)
+      expect(MyEnym.constants).to contain_exactly(:Nullary, :Unary, :Binary, :Matcher)
 
       b = MyEnym::Binary(a: 1, b: 2)
 
