@@ -106,7 +106,6 @@ class Validator < Ensure
 end
 
 describe Ensure do
-  None = Deterministic::Option::None.new
   Some = Deterministic::Option::Some
 
   it "Ensure" do

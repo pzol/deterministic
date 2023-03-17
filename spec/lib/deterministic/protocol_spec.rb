@@ -12,7 +12,7 @@ module Monoid
     }
   }
 
-  Int = Deterministic::instance(Monoid, M => Fixnum) {
+  Int = Deterministic::instance(Monoid, M => Integer) {
     def empty()
       0
     end
@@ -31,7 +31,7 @@ end
 
 describe Monoid do
   it "does something" do
-    expect(described_class.constants).to eq [:Protocol, :Int, :String]
+    expect(described_class.constants).to contain_exactly(:Protocol, :Int, :String)
     int = described_class::Int.new
     expect(int.empty).to eq 0
     expect(int.append(1, 2)).to eq 4
