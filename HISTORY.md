@@ -1,3 +1,8 @@
+## v0.17
+
+- Add tests for Ruby 2.7, 3.0, 3.1, and 3.2.
+- Fix compatibility issues with Ruby 3.0
+
 ## v0.14.1
 
 - Make Ruby 1.9.3 compatible
