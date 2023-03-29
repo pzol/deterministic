@@ -1,0 +1,20 @@
+name: Publish
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} && github.ref == 'refs/heads/master'
+    steps:
+      - run: echo 'publishing'
+
+      # - uses: actions/checkout@v3
+
+      # - name: Release Gem
+      #   uses: discourse/publish-rubygems-action@v2
+      #   env:
+      #     RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
