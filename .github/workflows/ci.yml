@@ -1,4 +1,4 @@
-name: Ruby workflows
+name: CI
 
 on: [push, pull_request]
 
